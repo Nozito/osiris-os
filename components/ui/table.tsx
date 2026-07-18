@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
@@ -60,7 +61,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "group/row relative border-b border-border/70 transition-colors duration-(--duration-fast) hover:bg-white/[0.025] has-aria-expanded:bg-white/[0.025] data-[state=selected]:bg-primary/[0.06]",
+        "group/row relative border-b border-border transition-colors duration-(--duration-fast) hover:bg-white/[0.025] has-aria-expanded:bg-white/[0.025] data-[state=selected]:bg-primary/[0.06]",
         className
       )}
       {...props}
@@ -94,6 +95,17 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   )
 }
 
+function TableRowLink({ href, className }: { href: string; className?: string }) {
+  return (
+    <Link
+      href={href}
+      tabIndex={-1}
+      aria-hidden
+      className={cn("absolute inset-0 z-0", className)}
+    />
+  )
+}
+
 function TableCaption({
   className,
   ...props
@@ -114,6 +126,7 @@ export {
   TableFooter,
   TableHead,
   TableRow,
+  TableRowLink,
   TableCell,
   TableCaption,
 }

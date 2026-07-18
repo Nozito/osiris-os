@@ -17,11 +17,12 @@ import {
 } from "@/components/ui/dialog";
 import { createClientRecord } from "@/app/(app)/clients/actions";
 import { clientSchema } from "@/lib/validations/client";
+import { useAutoOpen } from "@/lib/use-auto-open";
 
 type FieldName = keyof typeof clientSchema.shape;
 
 export function NewClientDialog() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAutoOpen();
   const [state, formAction, pending] = useActionState(createClientRecord, undefined);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, string>>>({});
 

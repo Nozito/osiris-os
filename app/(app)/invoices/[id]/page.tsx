@@ -42,7 +42,7 @@ export default async function InvoiceDetailPage({
 
       <Card>
         <CardHeader>
-          <p className="text-sm font-medium">Détail</p>
+          <p className="section-title">Détail</p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -55,7 +55,7 @@ export default async function InvoiceDetailPage({
               </div>
             ))}
           </div>
-          <div className="border-t border-border/60 pt-3 text-right text-sm">
+          <div className="border-t border-border pt-3 text-right text-sm">
             <p className="text-muted-foreground">HT : {formatEUR(totals.ht)}</p>
             <p className="text-muted-foreground">
               TVA ({invoice.vat_rate}%) : {formatEUR(totals.vat)}

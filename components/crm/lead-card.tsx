@@ -50,7 +50,7 @@ export function LeadCard({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onClick={onClick}
-      className="group/lead-card w-full cursor-grab rounded-lg border border-border/70 bg-card p-3 text-left shadow-[var(--shadow-xs)] transition-[border-color,box-shadow,transform] duration-(--duration-fast) ease-(--ease-premium) hover:-translate-y-[1px] hover:border-white/[0.16] hover:shadow-[var(--shadow-sm)] active:cursor-grabbing active:scale-[0.99]"
+      className="group/lead-card w-full cursor-grab rounded-lg border border-border bg-card p-3 text-left shadow-[var(--shadow-xs)] transition-[border-color,box-shadow,transform] duration-(--duration-fast) ease-(--ease-premium) hover:-translate-y-[1px] hover:border-white/[0.16] hover:shadow-[var(--shadow-sm)] active:cursor-grabbing active:scale-[0.99]"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -70,7 +70,7 @@ export function LeadCard({
       </div>
 
       {(lead.company || lead.budget || lead.urgency) && (
-        <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/50 pt-2 text-[11px] text-muted-foreground">
+        <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border pt-2 text-[11px] text-muted-foreground">
           {lead.company ? (
             <span className="flex min-w-0 items-center gap-1">
               <Building2 className="h-3 w-3 shrink-0" />

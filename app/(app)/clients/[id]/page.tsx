@@ -62,17 +62,27 @@ export default async function ClientDetailPage({
         <TabsContent value="infos" className="pt-4">
           <SectionForm
             action={updateClientInfo.bind(null, id)}
-            fields={[
-              { name: "company_name", label: "Entreprise", defaultValue: client.company_name },
-              { name: "contact_name", label: "Contact", defaultValue: client.contact_name },
-              { name: "email", label: "Email", defaultValue: client.email },
-              { name: "phone", label: "Téléphone", defaultValue: client.phone },
-              { name: "address", label: "Adresse", defaultValue: client.address },
-              { name: "sector", label: "Secteur", defaultValue: client.sector },
+            sections={[
               {
-                name: "current_website",
-                label: "Site actuel",
-                defaultValue: client.current_website,
+                title: "Identité",
+                fields: [
+                  { name: "company_name", label: "Entreprise", defaultValue: client.company_name },
+                  { name: "contact_name", label: "Contact", defaultValue: client.contact_name },
+                  { name: "sector", label: "Secteur", defaultValue: client.sector },
+                ],
+              },
+              {
+                title: "Coordonnées",
+                fields: [
+                  { name: "email", label: "Email", defaultValue: client.email },
+                  { name: "phone", label: "Téléphone", defaultValue: client.phone },
+                  { name: "address", label: "Adresse", defaultValue: client.address },
+                  {
+                    name: "current_website",
+                    label: "Site actuel",
+                    defaultValue: client.current_website,
+                  },
+                ],
               },
             ]}
           />
@@ -81,28 +91,39 @@ export default async function ClientDetailPage({
         <TabsContent value="avatar" className="pt-4">
           <SectionForm
             action={updateBusinessProfile.bind(null, id)}
-            fields={[
-              { name: "ideal_client", label: "Client idéal", defaultValue: profile?.ideal_client },
-              { name: "age_range", label: "Âge", defaultValue: profile?.age_range },
-              { name: "situation", label: "Situation", defaultValue: profile?.situation },
+            sections={[
               {
-                name: "avg_budget",
-                label: "Budget moyen (€)",
-                type: "number",
-                defaultValue: profile?.avg_budget,
+                title: "Profil",
+                description: "Qui est le client type de cette entreprise.",
+                fields: [
+                  { name: "ideal_client", label: "Client idéal", defaultValue: profile?.ideal_client },
+                  { name: "age_range", label: "Âge", defaultValue: profile?.age_range },
+                  { name: "situation", label: "Situation", defaultValue: profile?.situation },
+                  {
+                    name: "avg_budget",
+                    label: "Budget moyen (€)",
+                    type: "number",
+                    defaultValue: profile?.avg_budget,
+                  },
+                ],
               },
               {
-                name: "pain_points",
-                label: "Problématiques",
-                type: "textarea",
-                defaultValue: profile?.pain_points,
-              },
-              { name: "goals", label: "Objectifs", type: "textarea", defaultValue: profile?.goals },
-              {
-                name: "objections",
-                label: "Objections",
-                type: "textarea",
-                defaultValue: profile?.objections,
+                title: "Motivations",
+                fields: [
+                  {
+                    name: "pain_points",
+                    label: "Problématiques",
+                    type: "textarea",
+                    defaultValue: profile?.pain_points,
+                  },
+                  { name: "goals", label: "Objectifs", type: "textarea", defaultValue: profile?.goals },
+                  {
+                    name: "objections",
+                    label: "Objections",
+                    type: "textarea",
+                    defaultValue: profile?.objections,
+                  },
+                ],
               },
             ]}
           />
@@ -111,34 +132,44 @@ export default async function ClientDetailPage({
         <TabsContent value="offre" className="pt-4">
           <SectionForm
             action={updateBusinessProfile.bind(null, id)}
-            fields={[
+            sections={[
               {
-                name: "services",
-                label: "Services (un par ligne)",
-                type: "textarea",
-                defaultValue: (profile?.services as string[] | null)?.join("\n"),
+                title: "Catalogue",
+                fields: [
+                  {
+                    name: "services",
+                    label: "Services (un par ligne)",
+                    type: "textarea",
+                    defaultValue: (profile?.services as string[] | null)?.join("\n"),
+                  },
+                  {
+                    name: "products",
+                    label: "Produits (un par ligne)",
+                    type: "textarea",
+                    defaultValue: (profile?.products as string[] | null)?.join("\n"),
+                  },
+                ],
               },
               {
-                name: "products",
-                label: "Produits (un par ligne)",
-                type: "textarea",
-                defaultValue: (profile?.products as string[] | null)?.join("\n"),
-              },
-              {
-                name: "advantages",
-                label: "Avantages",
-                type: "textarea",
-                defaultValue: profile?.advantages,
-              },
-              {
-                name: "differentiation",
-                label: "Différenciation",
-                type: "textarea",
-                defaultValue: profile?.differentiation,
+                title: "Positionnement offre",
+                fields: [
+                  {
+                    name: "advantages",
+                    label: "Avantages",
+                    type: "textarea",
+                    defaultValue: profile?.advantages,
+                  },
+                  {
+                    name: "differentiation",
+                    label: "Différenciation",
+                    type: "textarea",
+                    defaultValue: profile?.differentiation,
+                  },
+                ],
               },
             ]}
           />
-          <div className="mt-4">
+          <div className="mt-6 border-t border-border pt-6">
             <AiOfferPanel clientId={id} />
           </div>
         </TabsContent>
@@ -146,19 +177,29 @@ export default async function ClientDetailPage({
         <TabsContent value="positionnement" className="pt-4">
           <SectionForm
             action={updateBusinessProfile.bind(null, id)}
-            fields={[
-              { name: "promise", label: "Promesse", type: "textarea", defaultValue: profile?.promise },
-              { name: "values", label: "Valeurs", type: "textarea", defaultValue: profile?.values },
+            sections={[
               {
-                name: "competitors",
-                label: "Concurrents",
-                type: "textarea",
-                defaultValue: profile?.competitors,
+                title: "Marque",
+                fields: [
+                  { name: "promise", label: "Promesse", type: "textarea", defaultValue: profile?.promise },
+                  { name: "values", label: "Valeurs", type: "textarea", defaultValue: profile?.values },
+                  {
+                    name: "communication_tone",
+                    label: "Ton de communication",
+                    defaultValue: profile?.communication_tone,
+                  },
+                ],
               },
               {
-                name: "communication_tone",
-                label: "Ton de communication",
-                defaultValue: profile?.communication_tone,
+                title: "Marché",
+                fields: [
+                  {
+                    name: "competitors",
+                    label: "Concurrents",
+                    type: "textarea",
+                    defaultValue: profile?.competitors,
+                  },
+                ],
               },
             ]}
           />
@@ -167,29 +208,39 @@ export default async function ClientDetailPage({
         <TabsContent value="branding" className="pt-4">
           <SectionForm
             action={updateBranding.bind(null, id)}
-            fields={[
-              { name: "logo_url", label: "URL du logo", defaultValue: branding?.logo_url },
+            sections={[
               {
-                name: "colors",
-                label: "Couleurs (une par ligne, hex)",
-                type: "textarea",
-                defaultValue: (branding?.colors as string[] | null)?.join("\n"),
+                title: "Identité visuelle",
+                fields: [
+                  { name: "logo_url", label: "URL du logo", defaultValue: branding?.logo_url },
+                  {
+                    name: "colors",
+                    label: "Couleurs (une par ligne, hex)",
+                    type: "textarea",
+                    defaultValue: (branding?.colors as string[] | null)?.join("\n"),
+                  },
+                  {
+                    name: "fonts",
+                    label: "Typographies (une par ligne)",
+                    type: "textarea",
+                    defaultValue: (branding?.fonts as string[] | null)?.join("\n"),
+                  },
+                ],
               },
               {
-                name: "fonts",
-                label: "Typographies (une par ligne)",
-                type: "textarea",
-                defaultValue: (branding?.fonts as string[] | null)?.join("\n"),
-              },
-              {
-                name: "inspirations",
-                label: "Inspirations (lien par ligne)",
-                type: "textarea",
-                defaultValue: (branding?.inspirations as string[] | null)?.join("\n"),
+                title: "Références",
+                fields: [
+                  {
+                    name: "inspirations",
+                    label: "Inspirations (lien par ligne)",
+                    type: "textarea",
+                    defaultValue: (branding?.inspirations as string[] | null)?.join("\n"),
+                  },
+                ],
               },
             ]}
           />
-          <div className="mt-4">
+          <div className="mt-6 border-t border-border pt-6">
             <AiWebStrategyPanel clientId={id} />
           </div>
         </TabsContent>

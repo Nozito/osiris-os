@@ -39,7 +39,7 @@ export function SignQuoteForm({ quoteId }: { quoteId: string }) {
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+    <div className="space-y-3 rounded-lg border border-primary/40 bg-primary/[0.06] p-4">
       <p className="text-sm font-medium">Signature électronique</p>
       <div className="space-y-1.5">
         <Label htmlFor="signed_by_name">Nom du signataire</Label>

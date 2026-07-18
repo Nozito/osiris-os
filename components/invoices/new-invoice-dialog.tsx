@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -23,13 +23,14 @@ import {
 } from "@/components/ui/dialog";
 import { ItemsEditor } from "@/components/billing/items-editor";
 import { createInvoice } from "@/app/(app)/invoices/actions";
+import { useAutoOpen } from "@/lib/use-auto-open";
 
 export function NewInvoiceDialog({
   clients,
 }: {
   clients: { id: string; company_name: string }[];
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAutoOpen();
   const [state, formAction, pending] = useActionState(createInvoice, undefined);
 
   useEffect(() => {

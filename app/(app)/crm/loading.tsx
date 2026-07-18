@@ -15,7 +15,7 @@ export default function Loading() {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="flex w-[280px] shrink-0 flex-col gap-2 rounded-xl border border-border/60 bg-white/[0.015] p-2"
+            className="flex w-[280px] shrink-0 flex-col gap-2 rounded-xl border border-border bg-white/[0.015] p-2"
           >
             <div className="flex items-center justify-between px-1 py-1.5">
               <Skeleton className="h-3 w-20" />

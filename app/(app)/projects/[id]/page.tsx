@@ -43,7 +43,7 @@ export default async function ProjectDetailPage({
         <div className="space-y-4 lg:col-span-2">
           <Card>
             <CardHeader>
-              <p className="text-sm font-medium">Description</p>
+              <p className="section-title">Description</p>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>{project.description || "Aucune description."}</p>
@@ -75,7 +75,7 @@ export default async function ProjectDetailPage({
 
         <Card>
           <CardHeader>
-            <p className="text-sm font-medium">Historique</p>
+            <p className="section-title">Historique</p>
           </CardHeader>
           <CardContent>
             <StatusTimeline history={history ?? []} />

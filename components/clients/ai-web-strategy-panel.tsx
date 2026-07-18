@@ -23,7 +23,7 @@ export function AiWebStrategyPanel({ clientId }: { clientId: string }) {
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-border/60 p-3">
+    <div className="space-y-3 rounded-lg border border-border p-3">
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium text-muted-foreground">
           Stratégie web générée par IA

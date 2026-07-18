@@ -80,12 +80,12 @@ function Chart({
         <Area
           type="monotone"
           dataKey="total"
-          stroke="#5b6cfa"
+          stroke="#0066ff"
           strokeWidth={2}
           fill="url(#revenueFill)"
           animationDuration={700}
           animationEasing="ease-out"
-          activeDot={{ r: 4, strokeWidth: 0, fill: "#5b6cfa" }}
+          activeDot={{ r: 4, strokeWidth: 0, fill: "#0066ff" }}
         />
       </AreaChart>
     </ResponsiveContainer>

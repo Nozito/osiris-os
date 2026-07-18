@@ -7,6 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScoreSlider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -16,10 +24,15 @@ import {
 } from "@/components/ui/sheet";
 import {
   updateLead,
+  updateLeadStatus,
   deleteLead,
   convertLeadToClient,
 } from "@/app/(app)/crm/actions";
+import { LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/validations/lead";
+import type { Database } from "@/types/database.types";
 import { ProspectAnalysis } from "@/components/crm/prospect-analysis";
+
+type LeadStatus = Database["public"]["Enums"]["lead_status"];
 
 const SCORE_CRITERIA = [
   { name: "budget_score", label: "Budget" },
@@ -98,6 +111,19 @@ function LeadDetailForm({ lead, onClose }: { lead: LeadDetail; onClose: () => vo
     wasPending.current = pending;
   }, [pending, state, router]);
 
+  function handleStatusChange(status: string | null) {
+    if (!status || status === lead.status) return;
+    startTransition(async () => {
+      try {
+        await updateLeadStatus(lead.id, status as LeadStatus);
+        toast.success("Statut mis à jour");
+        router.refresh();
+      } catch {
+        toast.error("Impossible de changer le statut.");
+      }
+    });
+  }
+
   function handleConvert() {
     startTransition(async () => {
       try {
@@ -125,6 +151,24 @@ function LeadDetailForm({ lead, onClose }: { lead: LeadDetail; onClose: () => vo
       <SheetHeader>
         <SheetTitle>{lead.name}</SheetTitle>
       </SheetHeader>
+      <div className="px-4">
+        <Select
+          value={lead.status}
+          onValueChange={handleStatusChange}
+          disabled={isPending}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {LEAD_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {LEAD_STATUS_LABELS[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <form action={formAction} className="space-y-4 px-4">
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
@@ -171,32 +215,31 @@ function LeadDetailForm({ lead, onClose }: { lead: LeadDetail; onClose: () => vo
 
         <ProspectAnalysis leadId={lead.id} />
 
-        <div className="space-y-3 rounded-lg border border-border/60 p-3">
+        <div className="space-y-4 rounded-lg border border-border p-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-muted-foreground">Scoring</p>
-            <span className="text-xs font-semibold tabular-nums">
-              Total : {lead.scores?.total_score ?? "—"}
+            <p className="section-title text-xs text-muted-foreground uppercase tracking-wide">
+              Scoring
+            </p>
+            <span className="stat-value text-sm">
+              {lead.scores?.total_score ?? "—"}
+              <span className="text-xs font-normal text-muted-foreground"> / 100</span>
             </span>
           </div>
           {SCORE_CRITERIA.map((criterion) => (
-            <div key={criterion.name} className="space-y-1">
+            <div key={criterion.name} className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <Label htmlFor={criterion.name}>{criterion.label}</Label>
                 <span className="tabular-nums text-muted-foreground">
                   {scores[criterion.name as keyof typeof scores]}
                 </span>
               </div>
-              <input
+              <ScoreSlider
                 id={criterion.name}
                 name={criterion.name}
-                type="range"
-                min={0}
-                max={100}
                 value={scores[criterion.name as keyof typeof scores]}
                 onChange={(e) =>
                   setScores((s) => ({ ...s, [criterion.name]: Number(e.target.value) }))
                 }
-                className="w-full accent-primary"
               />
             </div>
           ))}

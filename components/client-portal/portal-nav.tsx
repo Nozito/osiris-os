@@ -16,7 +16,7 @@ export function PortalNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-1">
+    <nav className="flex items-center gap-4">
       {LINKS.map((link) => {
         const active = pathname === link.href;
         return (
@@ -24,20 +24,21 @@ export function PortalNav() {
             key={link.href}
             href={link.href}
             className={cn(
-              "rounded-md px-2.5 py-1.5 text-sm transition-colors",
-              active
-                ? "bg-secondary text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              "relative py-1.5 text-sm transition-colors duration-(--duration-fast)",
+              active ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             {link.label}
+            {active && (
+              <span className="absolute inset-x-0 -bottom-[1px] h-px bg-primary" />
+            )}
           </Link>
         );
       })}
       <form action={signOut}>
         <button
           type="submit"
-          className="ml-2 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground"
+          className="text-sm text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground"
         >
           Déconnexion
         </button>

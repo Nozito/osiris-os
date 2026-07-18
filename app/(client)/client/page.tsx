@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { FolderKanban, UserX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getClientForCurrentUser } from "./data";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const STATUS_LABELS: Record<string, string> = {
   onboarding: "Onboarding",
@@ -19,10 +21,11 @@ export default async function ClientHomePage() {
 
   if (!client) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-        Aucun espace client n&apos;est encore associé à votre compte. Contactez
-        votre interlocuteur Osiris Agency.
-      </div>
+      <EmptyState
+        icon={UserX}
+        title="Aucun espace client associé"
+        description="Contactez votre interlocuteur Osiris Agency pour lier votre compte."
+      />
     );
   }
 
@@ -36,10 +39,15 @@ export default async function ClientHomePage() {
   const profileComplete = Boolean(client.client_business_profiles?.promise);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div>
+        <p className="text-sm text-muted-foreground">Bienvenue,</p>
+        <h1 className="page-title text-[1.75rem]">{client.company_name}</h1>
+      </div>
+
       {!profileComplete && (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardContent className="flex items-center justify-between py-4">
+        <Card className="glass border-primary/20">
+          <CardContent className="flex items-center justify-between gap-4 py-4">
             <div>
               <p className="text-sm font-medium">Complétez votre onboarding</p>
               <p className="text-sm text-muted-foreground">
@@ -51,38 +59,40 @@ export default async function ClientHomePage() {
         </Card>
       )}
 
-      <div>
-        <h2 className="page-title">Vos projets</h2>
-      </div>
+      <div className="space-y-3">
+        <p className="section-title text-muted-foreground">Vos projets</p>
 
-      {!projects || projects.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-          Aucun projet en cours pour l&apos;instant.
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {projects.map((project) => (
-            <Link key={project.id} href={`/client/projects/${project.id}`} className="block">
-              <Card className="transition-colors hover:border-primary/40">
-                <CardHeader className="flex-row items-center justify-between pb-0">
-                  <p className="text-sm font-medium">{project.name}</p>
-                  <Badge variant="secondary">
-                    {STATUS_LABELS[project.status] ?? project.status}
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  {project.delivery_date && (
-                    <p className="text-xs text-muted-foreground">
-                      Livraison prévue :{" "}
-                      {new Date(project.delivery_date).toLocaleDateString("fr-FR")}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
+        {!projects || projects.length === 0 ? (
+          <EmptyState
+            icon={FolderKanban}
+            title="Aucun projet en cours"
+            description="Vos projets apparaîtront ici dès qu'Osiris Agency en aura démarré un."
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {projects.map((project) => (
+              <Link key={project.id} href={`/client/projects/${project.id}`} className="block">
+                <Card className="h-full transition-[border-color,box-shadow,transform] duration-(--duration-base) ease-(--ease-premium) hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-md)]">
+                  <CardHeader className="flex-row items-center justify-between pb-0">
+                    <p className="font-heading text-sm font-medium">{project.name}</p>
+                    <Badge variant="secondary">
+                      {STATUS_LABELS[project.status] ?? project.status}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent>
+                    {project.delivery_date && (
+                      <p className="text-xs text-muted-foreground">
+                        Livraison prévue :{" "}
+                        {new Date(project.delivery_date).toLocaleDateString("fr-FR")}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

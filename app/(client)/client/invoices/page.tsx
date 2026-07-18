@@ -1,9 +1,10 @@
-import { Download } from "lucide-react";
+import { Download, Receipt, UserX } from "lucide-react";
 import { getClientForCurrentUser } from "../data";
 import { createClient } from "@/lib/supabase/server";
 import { InvoiceStatusBadge } from "@/components/invoices/status-badge";
 import { computeTotals } from "@/lib/validations/quote";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -22,9 +23,11 @@ export default async function ClientInvoicesPage() {
 
   if (!client) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-        Aucun espace client n&apos;est encore associé à votre compte.
-      </div>
+      <EmptyState
+        icon={UserX}
+        title="Aucun espace client associé"
+        description="Contactez votre interlocuteur Osiris Agency pour lier votre compte."
+      />
     );
   }
 
@@ -43,11 +46,13 @@ export default async function ClientInvoicesPage() {
       </p>
 
       {!invoices || invoices.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-          Aucune facture pour l&apos;instant.
-        </div>
+        <EmptyState
+          icon={Receipt}
+          title="Aucune facture pour l'instant"
+          description="Vos factures apparaîtront ici dès qu'Osiris Agency vous en aura émis une."
+        />
       ) : (
-        <div className="rounded-xl border border-border/60">
+        <div className="rounded-xl border border-border">
           <Table>
             <TableHeader>
               <TableRow>

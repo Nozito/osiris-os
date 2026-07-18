@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText } from "lucide-react";
+import { FileText, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { NewQuoteDialog } from "@/components/quotes/new-quote-dialog";
 import { QuoteStatusBadge } from "@/components/quotes/status-badge";
@@ -12,6 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableRowLink,
 } from "@/components/ui/table";
 
 function formatEUR(value: number) {
@@ -50,48 +51,77 @@ export default async function QuotesPage() {
           action={<NewQuoteDialog clients={clients ?? []} />}
         />
       ) : (
-        <div className="rounded-xl border border-border/60">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Numéro</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="text-right">Total TTC</TableHead>
-                <TableHead className="text-right">Créé le</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {quotes.map((quote) => {
-                const totals = computeTotals(quote.quote_items ?? [], quote.vat_rate);
-                return (
-                  <TableRow key={quote.id}>
-                    <TableCell>
-                      <Link
-                        href={`/quotes/${quote.id}`}
-                        className="font-medium hover:text-primary"
-                      >
-                        {quote.number}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
+        <>
+          <div className="hidden overflow-hidden rounded-xl border border-border sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Numéro</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="text-right">Total TTC</TableHead>
+                  <TableHead className="text-right">Créé le</TableHead>
+                  <TableHead className="w-8" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {quotes.map((quote) => {
+                  const totals = computeTotals(quote.quote_items ?? [], quote.vat_rate);
+                  return (
+                    <TableRow key={quote.id} className="group">
+                      <TableRowLink href={`/quotes/${quote.id}`} />
+                      <TableCell>
+                        <span className="font-medium group-hover:text-primary">
+                          {quote.number}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {quote.clients?.company_name ?? "—"}
+                      </TableCell>
+                      <TableCell>
+                        <QuoteStatusBadge status={quote.status} />
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {formatEUR(totals.ttc)}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {new Date(quote.created_at).toLocaleDateString("fr-FR")}
+                      </TableCell>
+                      <TableCell>
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity duration-(--duration-fast) group-hover:opacity-100" />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="space-y-2 sm:hidden">
+            {quotes.map((quote, i) => {
+              const totals = computeTotals(quote.quote_items ?? [], quote.vat_rate);
+              return (
+                <Link
+                  key={quote.id}
+                  href={`/quotes/${quote.id}`}
+                  className="animate-fade-in-up flex items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-xs)] transition-colors duration-(--duration-fast) active:bg-white/[0.03]"
+                  style={{ animationDelay: `${Math.min(i * 25, 300)}ms` }}
+                >
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="truncate text-sm font-medium">{quote.number}</p>
+                    <p className="truncate text-xs text-muted-foreground">
                       {quote.clients?.company_name ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      <QuoteStatusBadge status={quote.status} />
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatEUR(totals.ttc)}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {new Date(quote.created_at).toLocaleDateString("fr-FR")}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="stat-value text-sm">{formatEUR(totals.ttc)}</span>
+                    <QuoteStatusBadge status={quote.status} />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

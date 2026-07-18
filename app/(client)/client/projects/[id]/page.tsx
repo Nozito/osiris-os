@@ -47,7 +47,7 @@ export default async function ClientProjectDetailPage({
 
       <Card>
         <CardHeader>
-          <p className="text-sm font-medium">Progression</p>
+          <p className="section-title">Progression</p>
         </CardHeader>
         <CardContent className="space-y-3">
           <Progress value={PROGRESS[project.status]} />
@@ -65,7 +65,7 @@ export default async function ClientProjectDetailPage({
 
       <Card>
         <CardHeader>
-          <p className="text-sm font-medium">Historique</p>
+          <p className="section-title">Historique</p>
         </CardHeader>
         <CardContent>
           <StatusTimeline history={history ?? []} />

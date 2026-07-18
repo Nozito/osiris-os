@@ -23,6 +23,15 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Osiris OS",
   description: "Centre opérationnel d'Osiris Agency",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -31,10 +40,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased`}
-      >
+    <html
+      lang="fr"
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable}`}
+    >
+      <body className="antialiased">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster theme="dark" position="top-right" richColors />
       </body>

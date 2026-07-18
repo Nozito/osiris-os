@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,13 +24,14 @@ import {
 } from "@/components/ui/dialog";
 import { ItemsEditor } from "@/components/billing/items-editor";
 import { createQuote } from "@/app/(app)/quotes/actions";
+import { useAutoOpen } from "@/lib/use-auto-open";
 
 export function NewQuoteDialog({
   clients,
 }: {
   clients: { id: string; company_name: string }[];
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAutoOpen();
   const [state, formAction, pending] = useActionState(createQuote, undefined);
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export function NewQuoteDialog({
 
           <ItemsEditor />
 
-          <div className="space-y-1.5 rounded-lg border border-border/60 bg-white/[0.015] p-3">
+          <div className="space-y-1.5 rounded-lg border border-border bg-white/[0.015] p-3">
             <Label htmlFor="terms" className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
               Conditions générales
             </Label>

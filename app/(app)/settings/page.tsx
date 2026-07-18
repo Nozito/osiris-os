@@ -30,11 +30,11 @@ export default async function SettingsPage() {
           <p className="section-title">Compte</p>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <span className="text-muted-foreground">Nom</span>
             <span>{profile?.full_name || "—"}</span>
           </div>
-          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <span className="text-muted-foreground">Email</span>
             <span>{user?.email}</span>
           </div>

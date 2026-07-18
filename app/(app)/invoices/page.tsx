@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Receipt } from "lucide-react";
+import { Receipt, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { NewInvoiceDialog } from "@/components/invoices/new-invoice-dialog";
 import { InvoiceStatusBadge } from "@/components/invoices/status-badge";
@@ -12,6 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableRowLink,
 } from "@/components/ui/table";
 
 function formatEUR(value: number) {
@@ -50,50 +51,79 @@ export default async function InvoicesPage() {
           action={<NewInvoiceDialog clients={clients ?? []} />}
         />
       ) : (
-        <div className="rounded-xl border border-border/60">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Numéro</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="text-right">Total TTC</TableHead>
-                <TableHead className="text-right">Échéance</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((invoice) => {
-                const totals = computeTotals(invoice.invoice_items ?? [], invoice.vat_rate);
-                return (
-                  <TableRow key={invoice.id}>
-                    <TableCell>
-                      <Link
-                        href={`/invoices/${invoice.id}`}
-                        className="font-medium hover:text-primary"
-                      >
-                        {invoice.number}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
+        <>
+          <div className="hidden overflow-hidden rounded-xl border border-border sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Numéro</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="text-right">Total TTC</TableHead>
+                  <TableHead className="text-right">Échéance</TableHead>
+                  <TableHead className="w-8" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((invoice) => {
+                  const totals = computeTotals(invoice.invoice_items ?? [], invoice.vat_rate);
+                  return (
+                    <TableRow key={invoice.id} className="group">
+                      <TableRowLink href={`/invoices/${invoice.id}`} />
+                      <TableCell>
+                        <span className="font-medium group-hover:text-primary">
+                          {invoice.number}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {invoice.clients?.company_name ?? "—"}
+                      </TableCell>
+                      <TableCell>
+                        <InvoiceStatusBadge status={invoice.status} />
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {formatEUR(totals.ttc)}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {invoice.due_at
+                          ? new Date(invoice.due_at).toLocaleDateString("fr-FR")
+                          : "—"}
+                      </TableCell>
+                      <TableCell>
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity duration-(--duration-fast) group-hover:opacity-100" />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="space-y-2 sm:hidden">
+            {invoices.map((invoice, i) => {
+              const totals = computeTotals(invoice.invoice_items ?? [], invoice.vat_rate);
+              return (
+                <Link
+                  key={invoice.id}
+                  href={`/invoices/${invoice.id}`}
+                  className="animate-fade-in-up flex items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-xs)] transition-colors duration-(--duration-fast) active:bg-white/[0.03]"
+                  style={{ animationDelay: `${Math.min(i * 25, 300)}ms` }}
+                >
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="truncate text-sm font-medium">{invoice.number}</p>
+                    <p className="truncate text-xs text-muted-foreground">
                       {invoice.clients?.company_name ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      <InvoiceStatusBadge status={invoice.status} />
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatEUR(totals.ttc)}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {invoice.due_at
-                        ? new Date(invoice.due_at).toLocaleDateString("fr-FR")
-                        : "—"}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="stat-value text-sm">{formatEUR(totals.ttc)}</span>
+                    <InvoiceStatusBadge status={invoice.status} />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

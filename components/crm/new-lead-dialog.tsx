@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScoreSlider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { createLead } from "@/app/(app)/crm/actions";
 import { leadSchema } from "@/lib/validations/lead";
+import { useAutoOpen } from "@/lib/use-auto-open";
 
 type FieldName = keyof typeof leadSchema.shape;
 
@@ -30,7 +32,7 @@ const SCORE_CRITERIA = [
 ];
 
 export function NewLeadDialog() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAutoOpen();
   const [scores, setScores] = useState<Record<string, number>>({
     budget_score: 50,
     urgency_score: 50,
@@ -63,7 +65,7 @@ export function NewLeadDialog() {
       }
     }
     wasPending.current = pending;
-  }, [pending, state]);
+  }, [pending, state, setOpen]);
 
   return (
     <Dialog
@@ -150,29 +152,25 @@ export function NewLeadDialog() {
             <Textarea id="notes" name="notes" rows={2} />
           </div>
 
-          <div className="space-y-3 rounded-lg border border-border/60 p-3">
-            <p className="text-xs font-medium text-muted-foreground">
+          <div className="space-y-4 rounded-lg border border-border p-3">
+            <p className="section-title text-xs text-muted-foreground uppercase tracking-wide">
               Scoring (0-100 par critère)
             </p>
             {SCORE_CRITERIA.map((criterion) => (
-              <div key={criterion.name} className="space-y-1">
+              <div key={criterion.name} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <Label htmlFor={criterion.name}>{criterion.label}</Label>
                   <span className="tabular-nums text-muted-foreground">
                     {scores[criterion.name]}
                   </span>
                 </div>
-                <input
+                <ScoreSlider
                   id={criterion.name}
                   name={criterion.name}
-                  type="range"
-                  min={0}
-                  max={100}
                   value={scores[criterion.name]}
                   onChange={(e) =>
                     setScores((s) => ({ ...s, [criterion.name]: Number(e.target.value) }))
                   }
-                  className="w-full accent-primary"
                 />
               </div>
             ))}

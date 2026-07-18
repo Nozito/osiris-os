@@ -4,6 +4,10 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   updateClientInfo,
   updateBusinessProfile,
@@ -223,36 +227,24 @@ function StepFields({
             key={field.name}
             className={field.type === "textarea" ? "sm:col-span-2 space-y-1.5" : "space-y-1.5"}
           >
-            <label htmlFor={field.name} className="text-sm font-medium">
-              {field.label}
-            </label>
+            <Label htmlFor={field.name}>{field.label}</Label>
             {field.type === "textarea" ? (
-              <textarea
+              <Textarea
                 id={field.name}
                 name={field.name}
                 defaultValue={field.defaultValue ?? ""}
                 rows={4}
-                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
               />
             ) : (
-              <input
-                id={field.name}
-                name={field.name}
-                defaultValue={field.defaultValue ?? ""}
-                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
-              />
+              <Input id={field.name} name={field.name} defaultValue={field.defaultValue ?? ""} />
             )}
           </div>
         ))}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? "Enregistrement..." : submitLabel}
-      </button>
+      </Button>
     </>
   );
 }

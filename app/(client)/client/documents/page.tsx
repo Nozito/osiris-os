@@ -1,15 +1,19 @@
+import { UserX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getClientForCurrentUser } from "../data";
 import { DocumentsTab } from "@/components/clients/documents-tab";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default async function ClientDocumentsPage() {
   const client = await getClientForCurrentUser();
 
   if (!client) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-        Aucun espace client n&apos;est encore associé à votre compte.
-      </div>
+      <EmptyState
+        icon={UserX}
+        title="Aucun espace client associé"
+        description="Contactez votre interlocuteur Osiris Agency pour lier votre compte."
+      />
     );
   }
 

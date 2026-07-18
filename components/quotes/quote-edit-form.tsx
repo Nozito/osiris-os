@@ -61,7 +61,7 @@ export function QuoteEditForm({
         defaultVatRate={quote.vat_rate}
       />
 
-      <div className="space-y-1.5 rounded-lg border border-border/60 bg-white/[0.015] p-3">
+      <div className="space-y-1.5 rounded-lg border border-border bg-white/[0.015] p-3">
         <Label htmlFor="terms" className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
           Conditions générales
         </Label>

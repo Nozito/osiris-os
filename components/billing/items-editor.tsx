@@ -47,7 +47,7 @@ export function ItemsEditor({
   const totals = computeTotals(items, vatRate);
 
   return (
-    <div className="space-y-3 rounded-lg border border-border/60 bg-white/[0.015] p-3">
+    <div className="space-y-3 rounded-lg border border-border bg-white/[0.015] p-3">
       <input type="hidden" name="items" value={JSON.stringify(items)} />
 
       <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
@@ -110,7 +110,7 @@ export function ItemsEditor({
         Ajouter une ligne
       </Button>
 
-      <div className="flex items-center justify-between border-t border-border/60 pt-3">
+      <div className="flex items-center justify-between border-t border-border pt-3">
         <div className="flex items-center gap-2">
           <Label htmlFor="vat_rate" className="text-xs">
             TVA (%)

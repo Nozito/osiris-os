@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OsirisMark } from "@/components/layout/osiris-mark";
 import { signIn } from "./actions";
 
 export default function LoginPage() {
@@ -12,9 +13,7 @@ export default function LoginPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1a75ff] to-[#0052d4] text-primary-foreground font-bold glow-primary">
-          O
-        </span>
+        <OsirisMark size={44} className="mx-auto" />
         <h1 className="mt-4 page-title">
           Osiris <span className="text-primary">OS</span>
         </h1>

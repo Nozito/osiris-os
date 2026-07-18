@@ -1,4 +1,6 @@
+import { FolderKanban } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const STATUS_LABELS: Record<string, string> = {
   onboarding: "Onboarding",
@@ -23,9 +25,11 @@ export function ProjectsTab({
 }) {
   if (projects.length === 0) {
     return (
-      <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-        Aucun projet pour ce client.
-      </div>
+      <EmptyState
+        icon={FolderKanban}
+        title="Aucun projet pour ce client"
+        description="Lancez un premier projet depuis l'onglet Projets."
+      />
     );
   }
 
@@ -34,7 +38,7 @@ export function ProjectsTab({
       {projects.map((project) => (
         <div
           key={project.id}
-          className="flex items-center justify-between rounded-lg border border-border/60 p-3"
+          className="flex items-center justify-between rounded-lg border border-border p-3"
         >
           <div>
             <p className="text-sm font-medium">{project.name}</p>

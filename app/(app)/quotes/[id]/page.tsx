@@ -44,7 +44,7 @@ export default async function QuoteDetailPage({
       {quote.status === "draft" ? (
         <Card>
           <CardHeader>
-            <p className="text-sm font-medium">Modifier le devis</p>
+            <p className="section-title">Modifier le devis</p>
           </CardHeader>
           <CardContent>
             <QuoteEditForm quote={quote} items={items} />
@@ -53,7 +53,7 @@ export default async function QuoteDetailPage({
       ) : (
         <Card>
           <CardHeader>
-            <p className="text-sm font-medium">Détail</p>
+            <p className="section-title">Détail</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -66,7 +66,7 @@ export default async function QuoteDetailPage({
                 </div>
               ))}
             </div>
-            <div className="border-t border-border/60 pt-3 text-right text-sm">
+            <div className="border-t border-border pt-3 text-right text-sm">
               <p className="text-muted-foreground">HT : {formatEUR(totals.ht)}</p>
               <p className="text-muted-foreground">
                 TVA ({quote.vat_rate}%) : {formatEUR(totals.vat)}

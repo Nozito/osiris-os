@@ -19,6 +19,15 @@ const COLUMN_ACCENT: Record<LeadStatus, string> = {
   lost: "bg-white/15",
 };
 
+const COLUMN_SURFACE: Record<LeadStatus, string> = {
+  new: "bg-white/[0.015]",
+  qualification: "bg-white/[0.015]",
+  meeting: "bg-white/[0.015]",
+  quote_sent: "bg-primary/[0.025]",
+  signed: "bg-[color-mix(in_oklch,var(--success),transparent_96%)]",
+  lost: "bg-white/[0.008] opacity-75",
+};
+
 export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
   const [items, setItems] = useState(leads);
   useEffect(() => setItems(leads), [leads]);
@@ -93,7 +102,10 @@ export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
                   e.preventDefault();
                   setDragOverColumn(status);
                 }}
-                onDragLeave={() => setDragOverColumn((s) => (s === status ? null : s))}
+                onDragLeave={(e) => {
+                  if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                  setDragOverColumn((s) => (s === status ? null : s));
+                }}
                 onDrop={(e) => {
                   e.preventDefault();
                   const leadId = e.dataTransfer.getData("text/lead-id");
@@ -102,11 +114,12 @@ export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
                   setDraggingId(null);
                 }}
                 className={cn(
-                  "flex w-[280px] shrink-0 snap-start flex-col rounded-xl border border-border/60 bg-white/[0.015] transition-[border-color,background-color] duration-(--duration-fast)",
+                  "flex w-[280px] shrink-0 snap-start flex-col rounded-xl border border-border transition-[border-color,background-color] duration-(--duration-fast)",
+                  COLUMN_SURFACE[status],
                   isDragOver && "border-primary/50 bg-primary/[0.04] ring-1 ring-primary/30"
                 )}
               >
-                <div className="flex items-center justify-between gap-2 border-b border-border/50 px-3 py-2.5">
+                <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2.5">
                   <div className="flex items-center gap-1.5">
                     <span className={cn("h-1.5 w-1.5 rounded-full", COLUMN_ACCENT[status])} />
                     <p className="text-[12.5px] font-medium text-foreground/85">
@@ -124,7 +137,7 @@ export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
                         "flex flex-1 items-center justify-center rounded-lg border border-dashed text-[11px] transition-[opacity,border-color,color] duration-(--duration-fast)",
                         isDragOver
                           ? "border-primary/40 text-primary opacity-100"
-                          : "border-border/50 text-muted-foreground/60 opacity-100"
+                          : "border-border text-muted-foreground/60 opacity-100"
                       )}
                     >
                       {isDragOver ? "Déposer ici" : "Vide"}
@@ -152,7 +165,10 @@ export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
                             e.dataTransfer.setData("text/lead-id", lead.id);
                             setDraggingId(lead.id);
                           }}
-                          onDragEnd={() => setDraggingId(null)}
+                          onDragEnd={() => {
+                            setDraggingId(null);
+                            setDragOverColumn(null);
+                          }}
                           onClick={() => setSelected(lead)}
                         />
                       </div>

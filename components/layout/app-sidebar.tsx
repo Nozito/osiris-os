@@ -37,15 +37,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { OsirisMark } from "@/components/layout/osiris-mark";
 import { signOut } from "@/app/(auth)/login/actions";
 
-const navItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "CRM", url: "/crm", icon: KanbanSquare },
-  { title: "Clients", url: "/clients", icon: Users },
-  { title: "Projets", url: "/projects", icon: FolderKanban },
-  { title: "Devis", url: "/quotes", icon: FileText },
-  { title: "Factures", url: "/invoices", icon: Receipt },
+const navGroups = [
+  {
+    label: "Vue d'ensemble",
+    items: [{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard }],
+  },
+  {
+    label: "Commercial",
+    items: [
+      { title: "CRM", url: "/crm", icon: KanbanSquare },
+      { title: "Clients", url: "/clients", icon: Users },
+      { title: "Projets", url: "/projects", icon: FolderKanban },
+    ],
+  },
+  {
+    label: "Facturation",
+    items: [
+      { title: "Devis", url: "/quotes", icon: FileText },
+      { title: "Factures", url: "/invoices", icon: Receipt },
+    ],
+  },
 ];
 
 export function AppSidebar({
@@ -61,49 +75,49 @@ export function AppSidebar({
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
-      <SidebarHeader className="border-b border-sidebar-border/60 px-4 py-4 group-data-[collapsible=icon]:px-2.5">
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-4 group-data-[collapsible=icon]:px-2.5">
         <Link href="/dashboard" className="group relative flex items-center gap-2.5">
-          <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[#1a75ff] to-[#0052d4] text-[13px] font-bold text-primary-foreground shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_0_0_1px_rgba(0,102,255,0.3)] transition-transform duration-(--duration-base) ease-(--ease-premium) group-hover:scale-105">
-            O
-          </span>
-          <span className="text-sm font-semibold tracking-tight transition-opacity duration-(--duration-base) group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:opacity-0">
+          <OsirisMark size={28} />
+          <span className="font-heading text-sm font-bold tracking-tight transition-opacity duration-(--duration-base) group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:opacity-0">
             Osiris <span className="text-primary">OS</span>
           </span>
         </Link>
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => {
-                const isActive =
-                  pathname === item.url || pathname.startsWith(`${item.url}/`);
-                return (
-                  <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton
-                      render={<Link href={item.url} />}
-                      isActive={isActive}
-                      tooltip={item.title}
-                      className="relative text-foreground/70 transition-colors duration-(--duration-fast) data-active:bg-transparent data-active:font-medium data-active:text-primary [&_svg]:relative [&_svg]:z-10 [&_svg]:transition-colors [&_svg]:data-active:text-primary"
-                    >
-                      {isActive && (
-                        <motion.span
-                          layoutId="sidebar-active-pill"
-                          className="absolute inset-0 z-0 rounded-md bg-primary/[0.1] shadow-[inset_2px_0_0_0_var(--primary)]"
-                          transition={{ type: "spring", stiffness: 520, damping: 38 }}
-                        />
-                      )}
-                      <item.icon />
-                      <span className="relative z-10">{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const isActive =
+                    pathname === item.url || pathname.startsWith(`${item.url}/`);
+                  return (
+                    <SidebarMenuItem key={item.url}>
+                      <SidebarMenuButton
+                        render={<Link href={item.url} />}
+                        isActive={isActive}
+                        tooltip={item.title}
+                        className="relative text-foreground/70 transition-colors duration-(--duration-fast) data-active:bg-transparent data-active:font-medium data-active:text-primary [&_svg]:relative [&_svg]:z-10 [&_svg]:transition-colors [&_svg]:data-active:text-primary"
+                      >
+                        {isActive && (
+                          <motion.span
+                            layoutId="sidebar-active-pill"
+                            className="absolute inset-0 z-0 rounded-md bg-white/[0.06] shadow-[inset_2px_0_0_0_var(--primary)]"
+                            transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                          />
+                        )}
+                        <item.icon />
+                        <span className="relative z-10">{item.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       <SidebarFooter className="gap-2 px-2 pb-4">

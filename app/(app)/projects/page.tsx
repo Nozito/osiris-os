@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FolderKanban } from "lucide-react";
+import { FolderKanban, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -12,6 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableRowLink,
 } from "@/components/ui/table";
 
 export default async function ProjectsPage() {
@@ -44,45 +45,71 @@ export default async function ProjectsPage() {
           action={<NewProjectDialog clients={clients ?? []} />}
         />
       ) : (
-        <div className="rounded-xl border border-border/60">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Projet</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="text-right">Livraison</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {projects.map((project) => (
-                <TableRow key={project.id}>
-                  <TableCell>
-                    <Link
-                      href={`/projects/${project.id}`}
-                      className="font-medium hover:text-primary"
-                    >
-                      {project.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {project.clients?.company_name ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {PROJECT_STATUS_LABELS[project.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {project.delivery_date
-                      ? new Date(project.delivery_date).toLocaleDateString("fr-FR")
-                      : "—"}
-                  </TableCell>
+        <>
+          <div className="hidden overflow-hidden rounded-xl border border-border sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Projet</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="text-right">Livraison</TableHead>
+                  <TableHead className="w-8" />
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {projects.map((project) => (
+                  <TableRow key={project.id} className="group">
+                    <TableRowLink href={`/projects/${project.id}`} />
+                    <TableCell>
+                      <span className="font-medium group-hover:text-primary">
+                        {project.name}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {project.clients?.company_name ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {PROJECT_STATUS_LABELS[project.status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {project.delivery_date
+                        ? new Date(project.delivery_date).toLocaleDateString("fr-FR")
+                        : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity duration-(--duration-fast) group-hover:opacity-100" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="space-y-2 sm:hidden">
+            {projects.map((project, i) => (
+              <Link
+                key={project.id}
+                href={`/projects/${project.id}`}
+                className="animate-fade-in-up flex items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-xs)] transition-colors duration-(--duration-fast) active:bg-white/[0.03]"
+                style={{ animationDelay: `${Math.min(i * 25, 300)}ms` }}
+              >
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="truncate text-sm font-medium">{project.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {project.clients?.company_name ?? "—"}
+                  </p>
+                </div>
+                <Badge variant="secondary" className="shrink-0">
+                  {PROJECT_STATUS_LABELS[project.status]}
+                </Badge>
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

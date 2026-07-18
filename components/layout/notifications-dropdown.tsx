@@ -81,7 +81,7 @@ export function NotificationsDropdown() {
         }
       />
       <DropdownMenuContent align="end" className="w-80 p-0">
-        <div className="border-b border-border/70 px-3 py-2.5">
+        <div className="border-b border-border px-3 py-2.5">
           <p className="text-sm font-medium">Notifications</p>
         </div>
 

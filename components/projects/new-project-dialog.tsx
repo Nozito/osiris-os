@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,13 +24,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { createProject } from "@/app/(app)/projects/actions";
+import { useAutoOpen } from "@/lib/use-auto-open";
 
 export function NewProjectDialog({
   clients,
 }: {
   clients: { id: string; company_name: string }[];
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAutoOpen();
   const [state, formAction, pending] = useActionState(createProject, undefined);
 
   useEffect(() => {

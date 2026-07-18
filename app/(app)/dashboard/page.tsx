@@ -1,4 +1,4 @@
-import { Users, FileText, Euro, FolderKanban } from "lucide-react";
+import { Users, FileText, FolderKanban, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { CountUp } from "@/components/dashboard/count-up";
@@ -10,53 +10,75 @@ export default async function DashboardPage() {
     getRevenueTrend(),
   ]);
 
-  const kpiCards: {
+  const secondaryStats: {
     label: string;
     value: number;
     icon: typeof Users;
-    format?: "number" | "currency";
+    tone: "primary" | "muted";
   }[] = [
-    { label: "Leads actifs", value: kpis.leadsActifs, icon: Users },
-    { label: "Devis envoyés", value: kpis.devisEnvoyes, icon: FileText },
-    { label: "CA signé", value: kpis.caSigne, icon: Euro, format: "currency" },
-    { label: "Projets actifs", value: kpis.projetsActifs, icon: FolderKanban },
+    { label: "Leads actifs", value: kpis.leadsActifs, icon: Users, tone: "primary" },
+    { label: "Devis envoyés", value: kpis.devisEnvoyes, icon: FileText, tone: "muted" },
+    { label: "Projets actifs", value: kpis.projetsActifs, icon: FolderKanban, tone: "muted" },
   ];
+
+  const toneClasses: Record<string, string> = {
+    primary: "bg-primary/[0.12] text-primary",
+    muted: "bg-white/[0.05] text-muted-foreground",
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="page-title">Vue d&apos;ensemble</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="page-subtitle">
           Indicateurs commerciaux, financiers et production en temps réel.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="group">
-            <CardHeader className="flex-row items-center justify-between pb-2">
-              <p className="text-xs text-muted-foreground">{kpi.label}</p>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-                <kpi.icon className="h-3.5 w-3.5" />
-              </span>
-            </CardHeader>
-            <CardContent>
-              <p className="stat-value text-2xl">
-                <CountUp value={kpi.value} format={kpi.format} />
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card>
-        <CardHeader>
-          <p className="text-sm font-medium">Évolution du CA encaissé</p>
+      <Card className="relative overflow-hidden border-t-2 border-t-primary">
+        <CardHeader className="flex-row items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <TrendingUp className="h-3.5 w-3.5 text-primary" />
+              CA signé
+            </div>
+            <p className="stat-value mt-2 text-[2.75rem] leading-none">
+              <CountUp value={kpis.caSigne} format="currency" />
+            </p>
+          </div>
+          <p className="pt-1 text-xs text-muted-foreground">
+            Évolution du CA encaissé
+          </p>
         </CardHeader>
         <CardContent>
           <RevenueChart data={revenueTrend} />
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {secondaryStats.map((stat, i) => (
+          <Card
+            key={stat.label}
+            size="sm"
+            className="animate-fade-in-up"
+            style={{ animationDelay: `${i * 40}ms` }}
+          >
+            <CardContent className="flex items-center gap-3">
+              <span
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${toneClasses[stat.tone]}`}
+              >
+                <stat.icon className="h-4 w-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-xs text-muted-foreground">{stat.label}</p>
+                <p className="stat-value text-xl leading-tight">
+                  <CountUp value={stat.value} />
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { FileText, UserX } from "lucide-react";
 import { getClientForCurrentUser } from "../data";
 import { createClient } from "@/lib/supabase/server";
 import { QuoteStatusBadge } from "@/components/quotes/status-badge";
 import { computeTotals } from "@/lib/validations/quote";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -21,9 +23,11 @@ export default async function ClientQuotesPage() {
 
   if (!client) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-        Aucun espace client n&apos;est encore associé à votre compte.
-      </div>
+      <EmptyState
+        icon={UserX}
+        title="Aucun espace client associé"
+        description="Contactez votre interlocuteur Osiris Agency pour lier votre compte."
+      />
     );
   }
 
@@ -39,11 +43,13 @@ export default async function ClientQuotesPage() {
       <h2 className="page-title">Vos devis</h2>
 
       {!quotes || quotes.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground">
-          Aucun devis pour l&apos;instant.
-        </div>
+        <EmptyState
+          icon={FileText}
+          title="Aucun devis pour l'instant"
+          description="Vos devis apparaîtront ici dès qu'Osiris Agency vous en aura envoyé un."
+        />
       ) : (
-        <div className="rounded-xl border border-border/60">
+        <div className="rounded-xl border border-border">
           <Table>
             <TableHeader>
               <TableRow>

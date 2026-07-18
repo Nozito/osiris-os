@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { FileText, Image as ImageIcon, File, Upload, Trash2, Download, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { createClient } from "@/lib/supabase/client";
@@ -46,6 +47,7 @@ export function DocumentsTab({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const [uploading, setUploading] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   async function handleFiles(files: FileList) {
     setUploading(true);
@@ -97,7 +99,25 @@ export function DocumentsTab({
   }
 
   return (
-    <div className="space-y-4">
+    <div
+      className={cn(
+        "space-y-4 rounded-xl transition-colors duration-(--duration-fast)",
+        isDragOver && "outline-2 outline-dashed outline-primary/50"
+      )}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
+      onDragLeave={(e) => {
+        if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+        setIsDragOver(false);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
+      }}
+    >
       <input
         ref={inputRef}
         type="file"
@@ -125,7 +145,7 @@ export function DocumentsTab({
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="flex items-center justify-between rounded-lg border border-border/60 p-3"
+              className="flex items-center justify-between rounded-lg border border-border p-3"
             >
               <div className="flex items-center gap-2">
                 <IconFor category={doc.category} />
