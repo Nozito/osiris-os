@@ -40,11 +40,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { OsirisMark } from "@/components/layout/osiris-mark";
 import { signOut } from "@/app/(auth)/login/actions";
 
+const topLevelItem = { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard };
+
 const navGroups = [
-  {
-    label: "Vue d'ensemble",
-    items: [{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard }],
-  },
   {
     label: "Commercial",
     items: [
@@ -62,6 +60,35 @@ const navGroups = [
   },
 ];
 
+function NavLink({
+  item,
+  isActive,
+}: {
+  item: { title: string; url: string; icon: typeof LayoutDashboard };
+  isActive: boolean;
+}) {
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        render={<Link href={item.url} />}
+        isActive={isActive}
+        tooltip={item.title}
+        className="relative text-foreground/70 transition-colors duration-(--duration-fast) data-active:bg-transparent data-active:font-medium data-active:text-primary [&_svg]:relative [&_svg]:z-10 [&_svg]:transition-colors [&_svg]:data-active:text-primary"
+      >
+        {isActive && (
+          <motion.span
+            layoutId="sidebar-active-pill"
+            className="absolute inset-0 z-0 rounded-md bg-white/[0.06] shadow-[inset_2px_0_0_0_var(--primary)]"
+            transition={{ type: "spring", stiffness: 520, damping: 38 }}
+          />
+        )}
+        <item.icon />
+        <span className="relative z-10">{item.title}</span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
 export function AppSidebar({
   userName = "Utilisateur",
   userEmail,
@@ -73,47 +100,38 @@ export function AppSidebar({
   const { state, toggleSidebar, isMobile } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
 
+  function isItemActive(url: string) {
+    return pathname === url || pathname.startsWith(`${url}/`);
+  }
+
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4 group-data-[collapsible=icon]:px-2.5">
         <Link href="/dashboard" className="group relative flex items-center gap-2.5">
-          <OsirisMark size={28} />
-          <span className="font-heading text-sm font-bold tracking-tight transition-opacity duration-(--duration-base) group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:opacity-0">
+          <OsirisMark size={32} />
+          <span className="font-heading text-base font-bold tracking-tight transition-opacity duration-(--duration-base) group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:opacity-0">
             Osiris <span className="text-primary">OS</span>
           </span>
         </Link>
       </SidebarHeader>
 
       <SidebarContent>
+        <SidebarGroup className="pb-1">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <NavLink item={topLevelItem} isActive={isItemActive(topLevelItem.url)} />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {navGroups.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items.map((item) => {
-                  const isActive =
-                    pathname === item.url || pathname.startsWith(`${item.url}/`);
-                  return (
-                    <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton
-                        render={<Link href={item.url} />}
-                        isActive={isActive}
-                        tooltip={item.title}
-                        className="relative text-foreground/70 transition-colors duration-(--duration-fast) data-active:bg-transparent data-active:font-medium data-active:text-primary [&_svg]:relative [&_svg]:z-10 [&_svg]:transition-colors [&_svg]:data-active:text-primary"
-                      >
-                        {isActive && (
-                          <motion.span
-                            layoutId="sidebar-active-pill"
-                            className="absolute inset-0 z-0 rounded-md bg-white/[0.06] shadow-[inset_2px_0_0_0_var(--primary)]"
-                            transition={{ type: "spring", stiffness: 520, damping: 38 }}
-                          />
-                        )}
-                        <item.icon />
-                        <span className="relative z-10">{item.title}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
+                {group.items.map((item) => (
+                  <NavLink key={item.url} item={item} isActive={isItemActive(item.url)} />
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

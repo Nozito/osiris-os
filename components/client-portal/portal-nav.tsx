@@ -16,7 +16,7 @@ export function PortalNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-4">
+    <nav className="hidden items-center gap-4 md:flex">
       {LINKS.map((link) => {
         const active = pathname === link.href;
         return (

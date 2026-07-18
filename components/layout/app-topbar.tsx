@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTriggerAdaptive } from "@/components/layout/sidebar-trigger-adaptive";
 import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
+import { OsirisMark } from "@/components/layout/osiris-mark";
 
 const PAGE_TITLES: Record<string, { title: string; group?: string }> = {
   "/dashboard": { title: "Dashboard" },
@@ -32,6 +33,7 @@ export function AppTopbar() {
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
       <SidebarTriggerAdaptive className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 h-4" />
+      <OsirisMark size={24} className="md:hidden" />
       <div className="flex flex-1 items-baseline gap-1.5 text-sm tracking-tight">
         {group && (
           <>
