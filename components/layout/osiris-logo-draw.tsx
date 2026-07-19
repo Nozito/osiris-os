@@ -47,7 +47,9 @@ export function OsirisLogoDraw({
         style={{
           strokeDasharray: 1,
           strokeDashoffset: active ? 0 : 1,
-          transition: "stroke-dashoffset 900ms var(--ease-premium)",
+          transition: active
+            ? "stroke-dashoffset 1900ms var(--ease-premium)"
+            : "stroke-dashoffset 1700ms var(--ease-premium) 350ms",
         }}
       />
       <path
@@ -56,8 +58,8 @@ export function OsirisLogoDraw({
         style={{
           opacity: active ? 1 : 0,
           transition: active
-            ? "opacity 320ms ease 620ms"
-            : "opacity 220ms ease",
+            ? "opacity 550ms ease 1500ms"
+            : "opacity 350ms ease",
         }}
       />
     </svg>

@@ -4,8 +4,8 @@ import { useSyncExternalStore } from "react";
 
 type AuthTransitionState = { visible: boolean; mode: "in" | "out" };
 
-const DRAW_MS = 1000;
-const ERASE_MS = 850;
+const DRAW_MS = 2300;
+const ERASE_MS = 2300;
 
 let state: AuthTransitionState = { visible: false, mode: "in" };
 const listeners = new Set<() => void>();
