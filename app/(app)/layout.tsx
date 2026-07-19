@@ -23,7 +23,6 @@ export default async function AppLayout({
     <SidebarProvider defaultOpen={sidebarOpen}>
       <AppSidebar
         userName={account?.name}
-        userEmail={account?.email}
         userRoleLabel={account?.roleLabel}
         counts={counts}
       />
