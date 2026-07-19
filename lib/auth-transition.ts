@@ -24,8 +24,10 @@ function getSnapshot() {
   return state;
 }
 
+const SERVER_SNAPSHOT: AuthTransitionState = { visible: false, mode: "in" };
+
 function getServerSnapshot(): AuthTransitionState {
-  return { visible: false, mode: "in" };
+  return SERVER_SNAPSHOT;
 }
 
 export function useAuthTransition() {
