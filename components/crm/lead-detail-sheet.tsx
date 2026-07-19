@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +31,12 @@ import {
 } from "@/app/(app)/crm/actions";
 import { LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/validations/lead";
 import type { Database } from "@/types/database.types";
-import { ProspectAnalysis } from "@/components/crm/prospect-analysis";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ProspectAnalysis = dynamic(
+  () => import("@/components/crm/prospect-analysis").then((mod) => mod.ProspectAnalysis),
+  { ssr: false, loading: () => <Skeleton className="h-16 w-full rounded-lg" /> }
+);
 
 type LeadStatus = Database["public"]["Enums"]["lead_status"];
 

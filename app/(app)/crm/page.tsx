@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NewLeadDialog } from "@/components/crm/new-lead-dialog";
-import { KanbanBoard } from "@/components/crm/kanban-board";
+import { CrmView } from "@/components/crm/crm-view";
 import type { LeadDetail } from "@/components/crm/lead-detail-sheet";
 import { PageHeader } from "@/components/layout/page-header";
 import { getCurrentRole } from "@/lib/get-current-role";
@@ -40,7 +40,7 @@ export default async function CrmPage() {
         actions={<NewLeadDialog />}
       />
 
-      <KanbanBoard leads={items} canDelete={role === "admin"} />
+      <CrmView leads={items} canDelete={role === "admin"} />
     </div>
   );
 }

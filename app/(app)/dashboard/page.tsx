@@ -1,6 +1,6 @@
 import { TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { RevenueChartLazy } from "@/components/dashboard/revenue-chart-lazy";
 import { CountUp } from "@/components/dashboard/count-up";
 import { PageHeader, StatRow } from "@/components/layout/page-header";
 import { getDashboardKpis, getRevenueTrend } from "./kpis";
@@ -34,7 +34,7 @@ export default async function DashboardPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <RevenueChart data={revenueTrend} />
+          <RevenueChartLazy data={revenueTrend} />
         </CardContent>
       </Card>
 

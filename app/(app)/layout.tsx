@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppBottomNav } from "@/components/layout/app-bottom-nav";
 import { PageTransition } from "@/components/layout/page-transition";
-import { CommandPalette } from "@/components/layout/command-palette";
+import { CommandPaletteLazy } from "@/components/layout/command-palette-lazy";
 import { getSidebarCounts, getCurrentAccount } from "./layout-data";
 
 export default async function AppLayout({
@@ -31,7 +31,7 @@ export default async function AppLayout({
         </main>
         <AppBottomNav />
       </SidebarInset>
-      <CommandPalette />
+      <CommandPaletteLazy />
     </SidebarProvider>
   );
 }

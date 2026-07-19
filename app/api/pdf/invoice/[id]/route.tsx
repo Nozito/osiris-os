@@ -25,6 +25,7 @@ export async function GET(
   const buffer = await renderToBuffer(
     <InvoiceDocument
       number={invoice.number}
+      status={invoice.status}
       issuedAt={invoice.issued_at}
       dueAt={invoice.due_at}
       vatRate={invoice.vat_rate}

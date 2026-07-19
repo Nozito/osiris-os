@@ -11,8 +11,8 @@ import {
 } from "../actions";
 import { ProjectsTab } from "@/components/clients/projects-tab";
 import { DocumentsTab } from "@/components/clients/documents-tab";
-import { AiOfferPanel } from "@/components/clients/ai-offer-panel";
-import { AiWebStrategyPanel } from "@/components/clients/ai-web-strategy-panel";
+import { AiOfferPanelLazy } from "@/components/clients/ai-offer-panel-lazy";
+import { AiWebStrategyPanelLazy } from "@/components/clients/ai-web-strategy-panel-lazy";
 
 export default async function ClientDetailPage({
   params,
@@ -190,7 +190,7 @@ export default async function ClientDetailPage({
             ]}
           />
           <div className="mt-6 border-t border-border pt-6">
-            <AiOfferPanel clientId={id} />
+            <AiOfferPanelLazy clientId={id} />
           </div>
         </TabsContent>
 
@@ -261,7 +261,7 @@ export default async function ClientDetailPage({
             ]}
           />
           <div className="mt-6 border-t border-border pt-6">
-            <AiWebStrategyPanel clientId={id} />
+            <AiWebStrategyPanelLazy clientId={id} />
           </div>
         </TabsContent>
 

@@ -1,30 +1,16 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { DatePicker } from "@/components/ui/date-picker";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { ItemsEditor } from "@/components/billing/items-editor";
-import { createQuote } from "@/app/(app)/quotes/actions";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { DialogFormSkeleton } from "@/components/ui/dialog-form-skeleton";
 import { useAutoOpen } from "@/lib/use-auto-open";
+
+const NewQuoteDialogContent = dynamic(
+  () => import("./new-quote-dialog-content").then((mod) => mod.NewQuoteDialogContent),
+  { ssr: false, loading: () => <DialogFormSkeleton /> }
+);
 
 export function NewQuoteDialog({
   clients,
@@ -32,11 +18,6 @@ export function NewQuoteDialog({
   clients: { id: string; company_name: string }[];
 }) {
   const [open, setOpen] = useAutoOpen();
-  const [state, formAction, pending] = useActionState(createQuote, undefined);
-
-  useEffect(() => {
-    if (state?.error) toast.error(state.error);
-  }, [state]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -48,53 +29,7 @@ export function NewQuoteDialog({
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Nouveau devis</DialogTitle>
-        </DialogHeader>
-        <form action={formAction} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="client_id">Client *</Label>
-              <Select name="client_id" required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner un client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.company_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="valid_until">Valable jusqu&apos;au</Label>
-              <DatePicker id="valid_until" name="valid_until" />
-            </div>
-          </div>
-
-          <ItemsEditor />
-
-          <div className="space-y-1.5 rounded-lg border border-border bg-white/[0.015] p-3">
-            <Label htmlFor="terms" className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-              Conditions générales
-            </Label>
-            <Textarea id="terms" name="terms" rows={3} />
-          </div>
-
-          {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
-          <div className="flex gap-2">
-            <DialogClose render={<Button type="button" variant="outline" className="flex-1" />}>
-              Annuler
-            </DialogClose>
-            <Button type="submit" className="flex-1" disabled={pending}>
-              {pending ? "Création..." : "Créer le devis"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
+      {open && <NewQuoteDialogContent clients={clients} />}
     </Dialog>
   );
 }

@@ -1,13 +1,22 @@
-import { Document, Page, Text, View } from "@react-pdf/renderer";
-import { styles } from "./styles";
+import path from "path";
+import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
+import { styles, STATUS_TONES, formatEUR } from "./styles";
 import { computeTotals } from "@/lib/validations/quote";
+import { INVOICE_STATUS_LABELS } from "@/lib/validations/invoice";
 
-function formatEUR(value: number) {
-  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
-}
+const LOGO_PATH = path.join(process.cwd(), "public", "osiris-logo-black.png");
+
+const STATUS_TONE: Record<string, keyof typeof STATUS_TONES> = {
+  created: "secondary",
+  sent: "warning",
+  paid: "success",
+  overdue: "destructive",
+  cancelled: "destructive",
+};
 
 type InvoicePdfProps = {
   number: string | null;
+  status: string;
   issuedAt: string | null;
   dueAt: string | null;
   vatRate: number;
@@ -22,6 +31,7 @@ type InvoicePdfProps = {
 
 export function InvoiceDocument({
   number,
+  status,
   issuedAt,
   dueAt,
   vatRate,
@@ -29,56 +39,80 @@ export function InvoiceDocument({
   items,
 }: InvoicePdfProps) {
   const totals = computeTotals(items, vatRate);
+  const tone = STATUS_TONES[STATUS_TONE[status] ?? "secondary"];
+  const statusLabel =
+    INVOICE_STATUS_LABELS[status as keyof typeof INVOICE_STATUS_LABELS] ?? status;
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.brand}>Osiris Agency</Text>
-            <Text style={styles.brandSub}>contact@osiris-agency.fr</Text>
-          </View>
-          <View>
-            <Text style={styles.docTitle}>FACTURE</Text>
-            <Text style={styles.docNumber}>{number}</Text>
-            {issuedAt && (
-              <Text style={styles.docNumber}>
-                {new Date(issuedAt).toLocaleDateString("fr-FR")}
-              </Text>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.clientBlock}>
-          <Text style={styles.label}>Facturé à</Text>
-          <Text>{client.company_name}</Text>
-          {client.contact_name && <Text>{client.contact_name}</Text>}
-          {client.address && <Text>{client.address}</Text>}
-          {client.email && <Text>{client.email}</Text>}
-        </View>
-
-        {dueAt && (
-          <Text style={{ marginBottom: 12 }}>
-            Échéance : {new Date(dueAt).toLocaleDateString("fr-FR")} — paiement par virement
-            bancaire uniquement
+        <View style={styles.headerWrap}>
+          <Image src={LOGO_PATH} style={styles.logo} />
+          <Text style={styles.kicker}>OSIRIS AGENCY</Text>
+          <Text style={styles.docTitle}>FACTURE</Text>
+          <View style={styles.titleRule} />
+          <Text
+            style={[
+              styles.statusBadge,
+              { backgroundColor: tone.bg, color: tone.fg },
+            ]}
+          >
+            {statusLabel.toUpperCase()}
           </Text>
-        )}
+        </View>
+
+        <View style={styles.metaRow}>
+          <Text>
+            <Text style={styles.metaLabel}>N° </Text>
+            {number}
+          </Text>
+          {issuedAt && (
+            <Text>
+              <Text style={styles.metaLabel}>Date </Text>
+              {new Date(issuedAt).toLocaleDateString("fr-FR")}
+            </Text>
+          )}
+          {dueAt && (
+            <Text>
+              <Text style={styles.metaLabel}>Échéance </Text>
+              {new Date(dueAt).toLocaleDateString("fr-FR")}
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.cardGrid}>
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>ÉMETTEUR</Text>
+            <Text style={styles.cardLineStrong}>Osiris Agency</Text>
+            <Text style={styles.cardLine}>contact@osiris-agency.fr</Text>
+          </View>
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>FACTURÉ À</Text>
+            <Text style={styles.cardLineStrong}>{client.company_name}</Text>
+            {client.contact_name && <Text style={styles.cardLine}>{client.contact_name}</Text>}
+            {client.address && <Text style={styles.cardLine}>{client.address}</Text>}
+            {client.email && <Text style={styles.cardLine}>{client.email}</Text>}
+          </View>
+        </View>
 
         <View style={styles.table}>
           <View style={styles.tableHeaderRow}>
-            <Text style={styles.colLabel}>Prestation</Text>
-            <Text style={styles.colQty}>Qté</Text>
-            <Text style={styles.colPrice}>Prix unitaire</Text>
-            <Text style={styles.colTotal}>Total HT</Text>
+            <Text style={[styles.tableHeaderCell, styles.colLabel]}>PRESTATION</Text>
+            <Text style={[styles.tableHeaderCell, styles.colQty]}>QTÉ</Text>
+            <Text style={[styles.tableHeaderCell, styles.colPrice]}>PU HT</Text>
+            <Text style={[styles.tableHeaderCell, styles.colTotal]}>TOTAL HT</Text>
           </View>
           {items.map((item, i) => (
             <View style={styles.tableRow} key={i}>
-              <Text style={styles.colLabel}>{item.label}</Text>
+              <View style={styles.colLabel}>
+                <Text style={styles.itemLabelStrong}>{item.label}</Text>
+                {item.description && (
+                  <Text style={styles.itemDescription}>{item.description}</Text>
+                )}
+              </View>
               <Text style={styles.colQty}>{item.quantity}</Text>
               <Text style={styles.colPrice}>{formatEUR(item.unit_price)}</Text>
-              <Text style={styles.colTotal}>
-                {formatEUR(item.quantity * item.unit_price)}
-              </Text>
+              <Text style={styles.colTotal}>{formatEUR(item.quantity * item.unit_price)}</Text>
             </View>
           ))}
         </View>
@@ -92,9 +126,25 @@ export function InvoiceDocument({
             <Text>TVA ({vatRate}%)</Text>
             <Text>{formatEUR(totals.vat)}</Text>
           </View>
-          <View style={[styles.totalRow, styles.totalTtc]}>
-            <Text>Total TTC</Text>
-            <Text>{formatEUR(totals.ttc)}</Text>
+        </View>
+        <View style={styles.totalRowFinal}>
+          <Text style={styles.totalFinalLabel}>TOTAL TTC</Text>
+          <Text style={styles.totalFinalValue}>{formatEUR(totals.ttc)}</Text>
+        </View>
+        {vatRate === 0 && (
+          <Text style={styles.vatMention}>TVA non applicable – art. 293 B du CGI</Text>
+        )}
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>MODALITÉS DE PAIEMENT</Text>
+          <View style={styles.cond}>
+            <Text>
+              Paiement par virement bancaire uniquement.
+              {dueAt &&
+                ` Réglement attendu avant le ${new Date(dueAt).toLocaleDateString("fr-FR")}.`}{" "}
+              Pénalités de retard applicables conformément à l&apos;article L441-10 du Code de
+              commerce.
+            </Text>
           </View>
         </View>
 
