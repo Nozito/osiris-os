@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NewLeadDialog } from "@/components/crm/new-lead-dialog";
 import { KanbanBoard } from "@/components/crm/kanban-board";
 import type { LeadDetail } from "@/components/crm/lead-detail-sheet";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function CrmPage() {
   const supabase = await createClient();
@@ -29,15 +30,10 @@ export default async function CrmPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="page-title">CRM</h2>
-          <p className="text-sm text-muted-foreground">
-            {items.length} lead{items.length > 1 ? "s" : ""} dans le pipeline
-          </p>
-        </div>
-        <NewLeadDialog />
-      </div>
+      <PageHeader
+        description={`${items.length} lead${items.length > 1 ? "s" : ""} dans le pipeline commercial.`}
+        actions={<NewLeadDialog />}
+      />
 
       <KanbanBoard leads={items} />
     </div>

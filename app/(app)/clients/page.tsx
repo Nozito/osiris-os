@@ -3,6 +3,7 @@ import { Users, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { NewClientDialog } from "@/components/clients/new-client-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   Table,
   TableBody,
@@ -23,15 +24,10 @@ export default async function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="page-title">Clients</h2>
-          <p className="text-sm text-muted-foreground">
-            {clients?.length ?? 0} client{(clients?.length ?? 0) > 1 ? "s" : ""}
-          </p>
-        </div>
-        <NewClientDialog />
-      </div>
+      <PageHeader
+        description={`${clients?.length ?? 0} client${(clients?.length ?? 0) > 1 ? "s" : ""} au portefeuille.`}
+        actions={<NewClientDialog />}
+      />
 
       {!clients || clients.length === 0 ? (
         <EmptyState

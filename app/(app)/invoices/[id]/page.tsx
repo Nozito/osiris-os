@@ -32,7 +32,7 @@ export default async function InvoiceDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="page-title">{invoice.number}</h2>
+          <h2 className="font-heading text-lg font-bold tracking-tight">{invoice.number}</h2>
           <p className="text-sm text-muted-foreground">{invoice.clients?.company_name}</p>
         </div>
         <InvoiceStatusBadge status={invoice.status} />
@@ -55,12 +55,20 @@ export default async function InvoiceDetailPage({
               </div>
             ))}
           </div>
-          <div className="border-t border-border pt-3 text-right text-sm">
-            <p className="text-muted-foreground">HT : {formatEUR(totals.ht)}</p>
+          <div className="space-y-1.5 border-t border-border pt-3 text-right text-sm">
             <p className="text-muted-foreground">
-              TVA ({invoice.vat_rate}%) : {formatEUR(totals.vat)}
+              HT <span className="ml-3 text-foreground/80">{formatEUR(totals.ht)}</span>
             </p>
-            <p className="font-semibold">TTC : {formatEUR(totals.ttc)}</p>
+            <p className="text-muted-foreground">
+              TVA ({invoice.vat_rate}%)
+              <span className="ml-3 text-foreground/80">{formatEUR(totals.vat)}</span>
+            </p>
+            <p className="pt-1 text-muted-foreground">
+              TTC
+              <span className="stat-value ml-3 text-lg text-foreground">
+                {formatEUR(totals.ttc)}
+              </span>
+            </p>
           </div>
           {invoice.due_at && (
             <p className="text-xs text-muted-foreground">

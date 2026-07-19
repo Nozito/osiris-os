@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NewInvoiceDialog } from "@/components/invoices/new-invoice-dialog";
 import { InvoiceStatusBadge } from "@/components/invoices/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader, StatRow } from "@/components/layout/page-header";
 import { computeTotals } from "@/lib/validations/quote";
 import {
   Table,
@@ -31,17 +32,30 @@ export default async function InvoicesPage() {
     supabase.from("clients").select("id, company_name").order("company_name"),
   ]);
 
+  const allTotals = (invoices ?? []).map((invoice) =>
+    computeTotals(invoice.invoice_items ?? [], invoice.vat_rate).ttc
+  );
+  const totalBilled = allTotals.reduce((sum, ttc) => sum + ttc, 0);
+  const totalPaid = (invoices ?? [])
+    .filter((invoice) => invoice.status === "paid")
+    .reduce((sum, invoice) => sum + computeTotals(invoice.invoice_items ?? [], invoice.vat_rate).ttc, 0);
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="page-title">Factures</h2>
-          <p className="text-sm text-muted-foreground">
-            {invoices?.length ?? 0} facture{(invoices?.length ?? 0) > 1 ? "s" : ""}
-          </p>
-        </div>
-        <NewInvoiceDialog clients={clients ?? []} />
-      </div>
+      <PageHeader
+        description={`${invoices?.length ?? 0} facture${(invoices?.length ?? 0) > 1 ? "s" : ""} émise${(invoices?.length ?? 0) > 1 ? "s" : ""}.`}
+        actions={<NewInvoiceDialog clients={clients ?? []} />}
+      />
+
+      {invoices && invoices.length > 0 && (
+        <StatRow
+          items={[
+            { label: "Total facturé", value: formatEUR(totalBilled), tone: "primary" },
+            { label: "Encaissé", value: formatEUR(totalPaid) },
+            { label: "En attente", value: formatEUR(totalBilled - totalPaid) },
+          ]}
+        />
+      )}
 
       {!invoices || invoices.length === 0 ? (
         <EmptyState

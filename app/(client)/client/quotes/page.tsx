@@ -40,7 +40,12 @@ export default async function ClientQuotesPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="page-title">Vos devis</h2>
+      <div>
+        <h2 className="page-title">Vos devis</h2>
+        <p className="text-sm text-muted-foreground">
+          Suivez le statut de chaque devis et signez en ligne.
+        </p>
+      </div>
 
       {!quotes || quotes.length === 0 ? (
         <EmptyState

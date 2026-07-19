@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { StatusSelect } from "@/components/projects/status-select";
 import { StatusTimeline } from "@/components/projects/status-timeline";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { StatRow } from "@/components/layout/page-header";
 
 export default async function ProjectDetailPage({
   params,
@@ -28,7 +29,7 @@ export default async function ProjectDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="page-title">{project.name}</h2>
+          <h2 className="font-heading text-lg font-bold tracking-tight">{project.name}</h2>
           <Link
             href={`/clients/${project.clients?.id}`}
             className="text-sm text-muted-foreground hover:text-primary"
@@ -45,30 +46,30 @@ export default async function ProjectDetailPage({
             <CardHeader>
               <p className="section-title">Description</p>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
               <p>{project.description || "Aucune description."}</p>
-              <div className="grid grid-cols-3 gap-3 text-foreground">
-                <div>
-                  <p className="text-xs text-muted-foreground">Budget</p>
-                  <p>{project.budget ? `${project.budget.toLocaleString("fr-FR")} €` : "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Début</p>
-                  <p>
-                    {project.start_date
+              <StatRow
+                items={[
+                  {
+                    label: "Budget",
+                    value: project.budget
+                      ? `${project.budget.toLocaleString("fr-FR")} €`
+                      : "—",
+                  },
+                  {
+                    label: "Début",
+                    value: project.start_date
                       ? new Date(project.start_date).toLocaleDateString("fr-FR")
-                      : "—"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Livraison</p>
-                  <p>
-                    {project.delivery_date
+                      : "—",
+                  },
+                  {
+                    label: "Livraison",
+                    value: project.delivery_date
                       ? new Date(project.delivery_date).toLocaleDateString("fr-FR")
-                      : "—"}
-                  </p>
-                </div>
-              </div>
+                      : "—",
+                  },
+                ]}
+              />
             </CardContent>
           </Card>
         </div>

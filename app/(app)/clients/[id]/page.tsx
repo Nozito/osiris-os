@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SectionForm } from "@/components/clients/section-form";
 import {
@@ -41,11 +43,29 @@ export default async function ClientDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="page-title">{client.company_name}</h2>
-        <p className="text-sm text-muted-foreground">
-          {client.sector || "Secteur non renseigné"}
-        </p>
+      <div className="flex items-center gap-3">
+        <Avatar className="h-11 w-11 shrink-0">
+          <AvatarFallback className="bg-secondary text-sm">
+            {client.company_name.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <h2 className="font-heading text-lg font-bold tracking-tight">
+            {client.company_name}
+          </h2>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {client.sector ? (
+              <Badge variant="secondary">{client.sector}</Badge>
+            ) : (
+              <span>Secteur non renseigné</span>
+            )}
+            {(projects?.length ?? 0) > 0 && (
+              <span>
+                {projects!.length} projet{projects!.length > 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       <Tabs defaultValue="infos">

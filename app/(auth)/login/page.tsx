@@ -11,18 +11,18 @@ export default function LoginPage() {
   const [state, formAction, pending] = useActionState(signIn, undefined);
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <OsirisMark size={44} className="mx-auto" />
-        <h1 className="mt-4 page-title">
-          Osiris <span className="text-primary">OS</span>
+    <div className="space-y-8">
+      <div className="space-y-1.5">
+        <OsirisMark size={32} className="mb-5 lg:hidden" />
+        <h1 className="font-heading text-xl font-bold tracking-tight">
+          Connexion
         </h1>
         <p className="text-sm text-muted-foreground">
-          Connectez-vous à votre espace
+          Accédez à votre espace Osiris OS.
         </p>
       </div>
 
-      <form action={formAction} className="space-y-4">
+      <form action={formAction} className="space-y-5">
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input id="email" name="email" type="email" placeholder="vous@osiris-agency.fr" required />
@@ -32,7 +32,9 @@ export default function LoginPage() {
           <Input id="password" name="password" type="password" placeholder="••••••••" required />
         </div>
         {state?.error && (
-          <p className="text-sm text-destructive">{state.error}</p>
+          <p className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {state.error}
+          </p>
         )}
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? "Connexion..." : "Se connecter"}

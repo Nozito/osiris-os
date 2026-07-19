@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/layout/page-header";
 import { PROJECT_STATUS_LABELS } from "@/lib/validations/project";
 import {
   Table,
@@ -14,6 +15,15 @@ import {
   TableRow,
   TableRowLink,
 } from "@/components/ui/table";
+
+const STATUS_TONE: Record<string, "secondary" | "warning" | "success"> = {
+  onboarding: "secondary",
+  design: "secondary",
+  development: "warning",
+  client_validation: "warning",
+  live: "success",
+  maintenance: "secondary",
+};
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
@@ -27,15 +37,10 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="page-title">Projets</h2>
-          <p className="text-sm text-muted-foreground">
-            {projects?.length ?? 0} projet{(projects?.length ?? 0) > 1 ? "s" : ""}
-          </p>
-        </div>
-        <NewProjectDialog clients={clients ?? []} />
-      </div>
+      <PageHeader
+        description={`${projects?.length ?? 0} projet${(projects?.length ?? 0) > 1 ? "s" : ""} en portefeuille de production.`}
+        actions={<NewProjectDialog clients={clients ?? []} />}
+      />
 
       {!projects || projects.length === 0 ? (
         <EmptyState
@@ -70,7 +75,7 @@ export default async function ProjectsPage() {
                       {project.clients?.company_name ?? "—"}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">
+                      <Badge variant={STATUS_TONE[project.status]}>
                         {PROJECT_STATUS_LABELS[project.status]}
                       </Badge>
                     </TableCell>
@@ -102,7 +107,7 @@ export default async function ProjectsPage() {
                     {project.clients?.company_name ?? "—"}
                   </p>
                 </div>
-                <Badge variant="secondary" className="shrink-0">
+                <Badge variant={STATUS_TONE[project.status]} className="shrink-0">
                   {PROJECT_STATUS_LABELS[project.status]}
                 </Badge>
                 <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />

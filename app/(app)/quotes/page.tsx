@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NewQuoteDialog } from "@/components/quotes/new-quote-dialog";
 import { QuoteStatusBadge } from "@/components/quotes/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/layout/page-header";
 import { computeTotals } from "@/lib/validations/quote";
 import {
   Table,
@@ -33,15 +34,10 @@ export default async function QuotesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="page-title">Devis</h2>
-          <p className="text-sm text-muted-foreground">
-            {quotes?.length ?? 0} devis
-          </p>
-        </div>
-        <NewQuoteDialog clients={clients ?? []} />
-      </div>
+      <PageHeader
+        description={`${quotes?.length ?? 0} devis émis.`}
+        actions={<NewQuoteDialog clients={clients ?? []} />}
+      />
 
       {!quotes || quotes.length === 0 ? (
         <EmptyState
