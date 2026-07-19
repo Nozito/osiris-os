@@ -35,14 +35,15 @@ export default async function DashboardPage() {
     ]);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
+        className="order-1"
         title="Vue d'ensemble"
         description="Indicateurs commerciaux, financiers et production en temps réel."
       />
 
       {/* Rangée 1 — KPI + raccourcis */}
-      <div className="flex flex-wrap items-start gap-3">
+      <div className="order-2 flex flex-wrap items-start gap-3">
         <StatRow
           className="flex-1"
           items={[
@@ -60,8 +61,20 @@ export default async function DashboardPage() {
         <DashboardShortcuts />
       </div>
 
-      {/* Rangée 2 — grand bloc CA + pipeline commercial */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {/*
+        Rangée "listes actionnables" vs "CA/pipeline" : sur mobile, ce qui
+        demande une action (leads/devis/factures/projets à traiter) doit
+        primer sur le graphe — inversé à partir de md. Même contenu, juste
+        réordonné en CSS, pas de duplication de rendu.
+      */}
+      <div className="order-3 grid grid-cols-1 gap-4 md:order-4 md:grid-cols-2">
+        <LeadsToFollowUp leads={leads} />
+        <QuotesPending quotes={quotes} />
+        <InvoicesToWatch invoices={invoices} />
+        <ProjectsInProgress projects={projects} />
+      </div>
+
+      <div className="order-4 grid grid-cols-1 gap-4 md:order-3 lg:grid-cols-3">
         <Card className="relative overflow-hidden border-t-2 border-t-primary lg:col-span-2">
           <CardHeader className="flex-row items-start justify-between gap-4">
             <div>
@@ -85,16 +98,10 @@ export default async function DashboardPage() {
         <PipelineBreakdown stages={pipeline} />
       </div>
 
-      {/* Rangée 3 — listes métier actionnables */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <LeadsToFollowUp leads={leads} />
-        <QuotesPending quotes={quotes} />
-        <InvoicesToWatch invoices={invoices} />
-        <ProjectsInProgress projects={projects} />
+      {/* Rangée 5 — activité récente */}
+      <div className="order-5">
+        <ActivityFeed events={activity} />
       </div>
-
-      {/* Rangée 4 — activité récente */}
-      <ActivityFeed events={activity} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { SuccessCheck } from "@/components/ui/success-check";
 import {
   updateClientInfo,
   updateBusinessProfile,
@@ -64,12 +66,40 @@ export function OnboardingWizard({
   };
 }) {
   const [step, setStep] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
   const info = useAdvanceOnSuccess(updateClientInfo.bind(null, clientId), next);
   const avatar = useAdvanceOnSuccess(updateBusinessProfile.bind(null, clientId), next);
   const positioning = useAdvanceOnSuccess(updateBusinessProfile.bind(null, clientId), next);
-  const branding = useAdvanceOnSuccess(updateBranding.bind(null, clientId), () => {});
+  const branding = useAdvanceOnSuccess(updateBranding.bind(null, clientId), () => setCompleted(true));
+
+  const slideVariants = {
+    enter: shouldReduceMotion ? {} : { opacity: 0, x: 16 },
+    center: { opacity: 1, x: 0 },
+    exit: shouldReduceMotion ? {} : { opacity: 0, x: -16 },
+  };
+  const slideTransition = shouldReduceMotion
+    ? { duration: 0 }
+    : { duration: 0.22, ease: [0.16, 1, 0.3, 1] as const };
+
+  if (completed) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-xl border border-border py-16 text-center">
+        <SuccessCheck size={48} />
+        <div className="space-y-1.5">
+          <p className="font-heading text-lg font-bold tracking-tight">
+            Onboarding terminé
+          </p>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            Merci ! Ces informations nous permettent de démarrer votre projet dans les
+            meilleures conditions. Notre équipe revient vers vous très vite.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -78,7 +108,7 @@ export function OnboardingWizard({
           <li key={label} className="flex flex-1 items-center gap-2">
             <span
               className={cn(
-                "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium",
+                "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium transition-colors duration-(--duration-base)",
                 i < step
                   ? "bg-primary text-primary-foreground"
                   : i === step
@@ -86,11 +116,24 @@ export function OnboardingWizard({
                     : "border border-border text-muted-foreground"
               )}
             >
-              {i < step ? <Check className="h-3.5 w-3.5" /> : i + 1}
+              {i < step ? (
+                <motion.span
+                  initial={shouldReduceMotion ? false : { scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={
+                    shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 20 }
+                  }
+                  className="flex items-center justify-center"
+                >
+                  <Check className="h-3.5 w-3.5" />
+                </motion.span>
+              ) : (
+                i + 1
+              )}
             </span>
             <span
               className={cn(
-                "text-xs",
+                "text-xs transition-colors duration-(--duration-base)",
                 i === step ? "text-foreground" : "text-muted-foreground"
               )}
             >
@@ -101,109 +144,147 @@ export function OnboardingWizard({
         ))}
       </ol>
 
-      {step === 0 && (
-        <form action={info.formAction} className="space-y-4">
-          <StepFields
-            fields={[
-              { name: "company_name", label: "Entreprise", defaultValue: defaults.company_name },
-              { name: "contact_name", label: "Contact", defaultValue: defaults.contact_name },
-              { name: "email", label: "Email", defaultValue: defaults.email },
-              { name: "phone", label: "Téléphone", defaultValue: defaults.phone },
-              { name: "address", label: "Adresse", defaultValue: defaults.address },
-              { name: "sector", label: "Secteur", defaultValue: defaults.sector },
-              {
-                name: "current_website",
-                label: "Site actuel",
-                defaultValue: defaults.current_website,
-              },
-            ]}
-            error={info.state?.error}
-            pending={info.pending}
-          />
-        </form>
-      )}
+      <AnimatePresence mode="wait">
+        {step === 0 && (
+          <motion.form
+            key="step-0"
+            action={info.formAction}
+            className="space-y-4"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
+          >
+            <StepFields
+              fields={[
+                { name: "company_name", label: "Entreprise", defaultValue: defaults.company_name },
+                { name: "contact_name", label: "Contact", defaultValue: defaults.contact_name },
+                { name: "email", label: "Email", defaultValue: defaults.email },
+                { name: "phone", label: "Téléphone", defaultValue: defaults.phone },
+                { name: "address", label: "Adresse", defaultValue: defaults.address },
+                { name: "sector", label: "Secteur", defaultValue: defaults.sector },
+                {
+                  name: "current_website",
+                  label: "Site actuel",
+                  defaultValue: defaults.current_website,
+                },
+              ]}
+              error={info.state?.error}
+              pending={info.pending}
+            />
+          </motion.form>
+        )}
 
-      {step === 1 && (
-        <form action={avatar.formAction} className="space-y-4">
-          <StepFields
-            fields={[
-              { name: "ideal_client", label: "Client idéal", defaultValue: defaults.ideal_client },
-              { name: "age_range", label: "Âge", defaultValue: defaults.age_range },
-              {
-                name: "pain_points",
-                label: "Problématiques",
-                type: "textarea",
-                defaultValue: defaults.pain_points,
-              },
-              { name: "goals", label: "Objectifs", type: "textarea", defaultValue: defaults.goals },
-              {
-                name: "services",
-                label: "Vos services (un par ligne)",
-                type: "textarea",
-                defaultValue: defaults.services?.join("\n"),
-              },
-              {
-                name: "advantages",
-                label: "Vos avantages",
-                type: "textarea",
-                defaultValue: defaults.advantages,
-              },
-            ]}
-            error={avatar.state?.error}
-            pending={avatar.pending}
-          />
-        </form>
-      )}
+        {step === 1 && (
+          <motion.form
+            key="step-1"
+            action={avatar.formAction}
+            className="space-y-4"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
+          >
+            <StepFields
+              fields={[
+                { name: "ideal_client", label: "Client idéal", defaultValue: defaults.ideal_client },
+                { name: "age_range", label: "Âge", defaultValue: defaults.age_range },
+                {
+                  name: "pain_points",
+                  label: "Problématiques",
+                  type: "textarea",
+                  defaultValue: defaults.pain_points,
+                },
+                { name: "goals", label: "Objectifs", type: "textarea", defaultValue: defaults.goals },
+                {
+                  name: "services",
+                  label: "Vos services (un par ligne)",
+                  type: "textarea",
+                  defaultValue: defaults.services?.join("\n"),
+                },
+                {
+                  name: "advantages",
+                  label: "Vos avantages",
+                  type: "textarea",
+                  defaultValue: defaults.advantages,
+                },
+              ]}
+              error={avatar.state?.error}
+              pending={avatar.pending}
+            />
+          </motion.form>
+        )}
 
-      {step === 2 && (
-        <form action={positioning.formAction} className="space-y-4">
-          <StepFields
-            fields={[
-              { name: "promise", label: "Votre promesse", type: "textarea", defaultValue: defaults.promise },
-              { name: "values", label: "Vos valeurs", type: "textarea", defaultValue: defaults.values },
-              {
-                name: "competitors",
-                label: "Concurrents",
-                type: "textarea",
-                defaultValue: defaults.competitors,
-              },
-            ]}
-            error={positioning.state?.error}
-            pending={positioning.pending}
-          />
-        </form>
-      )}
+        {step === 2 && (
+          <motion.form
+            key="step-2"
+            action={positioning.formAction}
+            className="space-y-4"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
+          >
+            <StepFields
+              fields={[
+                { name: "promise", label: "Votre promesse", type: "textarea", defaultValue: defaults.promise },
+                { name: "values", label: "Vos valeurs", type: "textarea", defaultValue: defaults.values },
+                {
+                  name: "competitors",
+                  label: "Concurrents",
+                  type: "textarea",
+                  defaultValue: defaults.competitors,
+                },
+              ]}
+              error={positioning.state?.error}
+              pending={positioning.pending}
+            />
+          </motion.form>
+        )}
 
-      {step === 3 && (
-        <form action={branding.formAction} className="space-y-4">
-          <StepFields
-            fields={[
-              { name: "logo_url", label: "URL du logo", defaultValue: defaults.logo_url },
-              {
-                name: "colors",
-                label: "Couleurs (une par ligne, hex)",
-                type: "textarea",
-                defaultValue: defaults.colors?.join("\n"),
-              },
-              {
-                name: "fonts",
-                label: "Typographies (une par ligne)",
-                type: "textarea",
-                defaultValue: defaults.fonts?.join("\n"),
-              },
-              {
-                name: "inspirations",
-                label: "Inspirations (lien par ligne)",
-                type: "textarea",
-                defaultValue: defaults.inspirations?.join("\n"),
-              },
-            ]}
-            error={branding.state?.error}
-            pending={branding.pending}
-            submitLabel="Terminer l'onboarding"
-          />
-        </form>
-      )}
+        {step === 3 && (
+          <motion.form
+            key="step-3"
+            action={branding.formAction}
+            className="space-y-4"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
+          >
+            <StepFields
+              fields={[
+                { name: "logo_url", label: "URL du logo", defaultValue: defaults.logo_url },
+                {
+                  name: "colors",
+                  label: "Couleurs (une par ligne, hex)",
+                  type: "textarea",
+                  defaultValue: defaults.colors?.join("\n"),
+                },
+                {
+                  name: "fonts",
+                  label: "Typographies (une par ligne)",
+                  type: "textarea",
+                  defaultValue: defaults.fonts?.join("\n"),
+                },
+                {
+                  name: "inspirations",
+                  label: "Inspirations (lien par ligne)",
+                  type: "textarea",
+                  defaultValue: defaults.inspirations?.join("\n"),
+                },
+              ]}
+              error={branding.state?.error}
+              pending={branding.pending}
+              submitLabel="Terminer l'onboarding"
+            />
+          </motion.form>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
