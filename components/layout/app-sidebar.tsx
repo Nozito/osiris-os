@@ -12,6 +12,7 @@ import {
   Receipt,
   Settings,
   LogOut,
+  Search,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
@@ -25,6 +26,7 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
@@ -39,23 +41,50 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { OsirisMark } from "@/components/layout/osiris-mark";
 import { useLogout } from "@/lib/use-logout";
+import { cn } from "@/lib/utils";
 
-const topLevelItem = { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard };
+type SidebarCounts = {
+  leadsActifs: number;
+  projetsActifs: number;
+  devisEnvoyes: number;
+  facturesEnRetard: number;
+};
 
-const navGroups = [
+type NavItem = {
+  title: string;
+  url: string;
+  icon: typeof LayoutDashboard;
+  countKey?: keyof SidebarCounts;
+  tone?: "default" | "destructive";
+};
+
+const topLevelItem: NavItem = { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard };
+
+const navGroups: { label: string; items: NavItem[] }[] = [
   {
-    label: "Commercial",
+    label: "Pipeline",
     items: [
-      { title: "CRM", url: "/crm", icon: KanbanSquare },
+      { title: "CRM", url: "/crm", icon: KanbanSquare, countKey: "leadsActifs" },
       { title: "Clients", url: "/clients", icon: Users },
-      { title: "Projets", url: "/projects", icon: FolderKanban },
+    ],
+  },
+  {
+    label: "Production",
+    items: [
+      { title: "Projets", url: "/projects", icon: FolderKanban, countKey: "projetsActifs" },
     ],
   },
   {
     label: "Facturation",
     items: [
-      { title: "Devis", url: "/quotes", icon: FileText },
-      { title: "Factures", url: "/invoices", icon: Receipt },
+      { title: "Devis", url: "/quotes", icon: FileText, countKey: "devisEnvoyes" },
+      {
+        title: "Factures",
+        url: "/invoices",
+        icon: Receipt,
+        countKey: "facturesEnRetard",
+        tone: "destructive",
+      },
     ],
   },
 ];
@@ -63,10 +92,14 @@ const navGroups = [
 function NavLink({
   item,
   isActive,
+  count,
 }: {
-  item: { title: string; url: string; icon: typeof LayoutDashboard };
+  item: NavItem;
   isActive: boolean;
+  count?: number;
 }) {
+  const hasCount = !!count && count > 0;
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
@@ -82,9 +115,30 @@ function NavLink({
             transition={{ type: "spring", stiffness: 520, damping: 38 }}
           />
         )}
-        <item.icon />
+        <span className="relative z-10 flex items-center">
+          <item.icon />
+          {hasCount && (
+            <span
+              className={cn(
+                "absolute -top-1 -right-1 hidden h-1.5 w-1.5 rounded-full group-data-[collapsible=icon]:block",
+                item.tone === "destructive" ? "bg-destructive" : "bg-primary"
+              )}
+            />
+          )}
+        </span>
         <span className="relative z-10">{item.title}</span>
       </SidebarMenuButton>
+      {hasCount && (
+        <SidebarMenuBadge
+          className={cn(
+            item.tone === "destructive"
+              ? "text-destructive"
+              : "text-muted-foreground"
+          )}
+        >
+          {count}
+        </SidebarMenuBadge>
+      )}
     </SidebarMenuItem>
   );
 }
@@ -92,9 +146,13 @@ function NavLink({
 export function AppSidebar({
   userName = "Utilisateur",
   userEmail,
+  userRoleLabel,
+  counts,
 }: {
   userName?: string;
   userEmail?: string;
+  userRoleLabel?: string;
+  counts?: SidebarCounts;
 }) {
   const pathname = usePathname();
   const { state, toggleSidebar, isMobile } = useSidebar();
@@ -103,6 +161,10 @@ export function AppSidebar({
 
   function isItemActive(url: string) {
     return pathname === url || pathname.startsWith(`${url}/`);
+  }
+
+  function countFor(item: NavItem) {
+    return item.countKey && counts ? counts[item.countKey] : undefined;
   }
 
   return (
@@ -123,21 +185,54 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent>
+        <SidebarGroup className="pt-2 pb-1">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip="Rechercher (⌘K)"
+                  onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Search />
+                  <span className="flex-1 text-left group-data-[collapsible=icon]:hidden">
+                    Rechercher
+                  </span>
+                  <kbd className="shrink-0 rounded border border-sidebar-border bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-muted-foreground group-data-[collapsible=icon]:hidden">
+                    ⌘K
+                  </kbd>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         <SidebarGroup className="pb-1">
           <SidebarGroupContent>
             <SidebarMenu>
-              <NavLink item={topLevelItem} isActive={isItemActive(topLevelItem.url)} />
+              <NavLink
+                item={topLevelItem}
+                isActive={isItemActive(topLevelItem.url)}
+                count={countFor(topLevelItem)}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         {navGroups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-[11px] font-medium tracking-wide text-sidebar-foreground/45 uppercase">
+              {group.label}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
-                  <NavLink key={item.url} item={item} isActive={isItemActive(item.url)} />
+                  <NavLink
+                    key={item.url}
+                    item={item}
+                    isActive={isItemActive(item.url)}
+                    count={countFor(item)}
+                  />
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
@@ -174,11 +269,9 @@ export function AppSidebar({
             </Avatar>
             <div className="min-w-0 flex-1 transition-opacity duration-(--duration-base) group-data-[collapsible=icon]:hidden">
               <p className="truncate text-sm font-medium">{userName}</p>
-              {userEmail && (
-                <p className="truncate text-xs text-muted-foreground">
-                  {userEmail}
-                </p>
-              )}
+              <p className="truncate text-xs text-muted-foreground">
+                {userRoleLabel ?? userEmail}
+              </p>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">

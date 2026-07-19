@@ -10,9 +10,9 @@ import { OsirisMark } from "@/components/layout/osiris-mark";
 
 const PAGE_TITLES: Record<string, { title: string; group?: string }> = {
   "/dashboard": { title: "Dashboard" },
-  "/crm": { title: "CRM", group: "Commercial" },
-  "/clients": { title: "Clients", group: "Commercial" },
-  "/projects": { title: "Projets", group: "Commercial" },
+  "/crm": { title: "CRM", group: "Pipeline" },
+  "/clients": { title: "Clients", group: "Pipeline" },
+  "/projects": { title: "Projets", group: "Production" },
   "/quotes": { title: "Devis", group: "Facturation" },
   "/invoices": { title: "Factures", group: "Facturation" },
   "/settings": { title: "Paramètres" },
