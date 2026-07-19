@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { quoteSchema } from "@/lib/validations/quote";
+import { notifyStaffQuoteSigned } from "@/lib/notify";
 import type { Database } from "@/types/database.types";
 
 export type ActionState = { error?: string } | undefined;
@@ -115,16 +116,28 @@ export async function updateQuoteStatus(quoteId: string, status: QuoteStatus) {
 
 export async function signQuote(quoteId: string, signedByName: string) {
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: quote, error } = await supabase
     .from("quotes")
     .update({
       status: "accepted",
       signed_by_name: signedByName,
       signed_at: new Date().toISOString(),
     })
-    .eq("id", quoteId);
-  if (error) throw new Error("Impossible de signer le devis.");
+    .eq("id", quoteId)
+    .select("id, number")
+    .single();
+  if (error || !quote) throw new Error("Impossible de signer le devis.");
   revalidatePath(`/client/quotes/${quoteId}`);
+
+  await notifyStaffQuoteSigned({
+    id: quote.id,
+    number: quote.number ?? quote.id,
+    signedByName,
+  }).catch(
+    () => {
+      // Best-effort: signing already succeeded, a failed notification shouldn't fail the flow.
+    }
+  );
 }
 
 export async function duplicateQuote(quoteId: string) {

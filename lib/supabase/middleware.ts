@@ -4,6 +4,9 @@ import { NextResponse, type NextRequest } from "next/server";
 const STAFF_PREFIXES = ["/dashboard", "/crm", "/clients", "/projects", "/quotes", "/invoices", "/settings"];
 const CLIENT_PREFIXES = ["/client"];
 const PUBLIC_PREFIXES = ["/login"];
+// Reset-password briefly creates an authenticated (recovery) session before the
+// user has set a new password — never bounce these away like /login does.
+const AUTH_ACTION_PREFIXES = ["/forgot-password", "/reset-password"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -35,6 +38,13 @@ export async function updateSession(request: NextRequest) {
   const isStaffRoute = STAFF_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
   const isClientRoute = CLIENT_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
   const isPublicRoute = PUBLIC_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
+  const isAuthActionRoute = AUTH_ACTION_PREFIXES.some(
+    (p) => path === p || path.startsWith(`${p}/`)
+  );
+
+  if (isAuthActionRoute) {
+    return response;
+  }
 
   if (!user && (isStaffRoute || isClientRoute)) {
     const url = request.nextUrl.clone();
