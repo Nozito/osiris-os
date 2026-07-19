@@ -1,8 +1,7 @@
-import { LogOut } from "lucide-react";
 import { PortalNav } from "@/components/client-portal/portal-nav";
 import { PortalBottomNav } from "@/components/client-portal/portal-bottom-nav";
+import { LogoutIconButton } from "@/components/client-portal/logout-icon-button";
 import { OsirisMark } from "@/components/layout/osiris-mark";
-import { signOut } from "@/app/(auth)/login/actions";
 
 export default function ClientPortalLayout({
   children,
@@ -26,15 +25,7 @@ export default function ClientPortalLayout({
             </span>
           </div>
           <PortalNav />
-          <form action={signOut} className="md:hidden">
-            <button
-              type="submit"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="sr-only">Déconnexion</span>
-            </button>
-          </form>
+          <LogoutIconButton className="md:hidden" />
         </div>
       </header>
       <main className="mx-auto max-w-4xl px-6 py-10 pb-24 md:pb-10">{children}</main>

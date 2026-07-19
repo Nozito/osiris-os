@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/app/(auth)/login/actions";
+import { useLogout } from "@/lib/use-logout";
 
 const LINKS = [
   { href: "/client", label: "Accueil" },
@@ -14,6 +14,7 @@ const LINKS = [
 
 export function PortalNav() {
   const pathname = usePathname();
+  const logout = useLogout();
 
   return (
     <nav className="hidden items-center gap-4 md:flex">
@@ -35,14 +36,13 @@ export function PortalNav() {
           </Link>
         );
       })}
-      <form action={signOut}>
-        <button
-          type="submit"
-          className="text-sm text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground"
-        >
-          Déconnexion
-        </button>
-      </form>
+      <button
+        type="button"
+        onClick={logout}
+        className="text-sm text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground"
+      >
+        Déconnexion
+      </button>
     </nav>
   );
 }

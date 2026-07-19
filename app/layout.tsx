@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthTransitionOverlay } from "@/components/layout/auth-transition-overlay";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,6 +60,7 @@ export default function RootLayout({
       <body className="antialiased">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster theme="dark" position="top-right" richColors />
+        <AuthTransitionOverlay />
       </body>
     </html>
   );

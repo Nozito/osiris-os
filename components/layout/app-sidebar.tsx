@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { OsirisMark } from "@/components/layout/osiris-mark";
-import { signOut } from "@/app/(auth)/login/actions";
+import { useLogout } from "@/lib/use-logout";
 
 const topLevelItem = { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard };
 
@@ -99,6 +99,7 @@ export function AppSidebar({
   const pathname = usePathname();
   const { state, toggleSidebar, isMobile } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
+  const logout = useLogout();
 
   function isItemActive(url: string) {
     return pathname === url || pathname.startsWith(`${url}/`);
@@ -186,17 +187,10 @@ export function AppSidebar({
               Paramètres
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              render={
-                <form action={signOut}>
-                  <button type="submit" className="flex w-full items-center">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Déconnexion
-                  </button>
-                </form>
-              }
-            />
+            <DropdownMenuItem variant="destructive" onClick={logout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Déconnexion
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarFooter>

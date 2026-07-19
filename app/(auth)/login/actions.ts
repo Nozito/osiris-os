@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const loginSchema = z.object({
@@ -9,7 +8,7 @@ const loginSchema = z.object({
   password: z.string().min(6),
 });
 
-export type LoginState = { error?: string } | undefined;
+export type LoginState = { error?: string; success?: boolean } | undefined;
 
 export async function signIn(
   _prevState: LoginState,
@@ -31,11 +30,14 @@ export async function signIn(
     return { error: "Identifiants incorrects." };
   }
 
-  redirect("/dashboard");
+  return { success: true };
 }
 
+/**
+ * Does not redirect: callers play the logo draw-out transition first, then
+ * navigate client-side once it resolves (see LogoutButton).
+ */
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/login");
 }

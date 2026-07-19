@@ -1,14 +1,27 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OsirisMark } from "@/components/layout/osiris-mark";
+import { playAuthTransition } from "@/lib/auth-transition";
 import { signIn } from "./actions";
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(signIn, undefined);
+  const router = useRouter();
+  const hasNavigated = useRef(false);
+
+  useEffect(() => {
+    if (!state?.success || hasNavigated.current) return;
+    hasNavigated.current = true;
+    playAuthTransition("in").then(() => {
+      router.push("/dashboard");
+      router.refresh();
+    });
+  }, [state, router]);
 
   return (
     <div className="space-y-8">
@@ -36,7 +49,7 @@ export default function LoginPage() {
             {state.error}
           </p>
         )}
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button type="submit" className="w-full" disabled={pending || state?.success}>
           {pending ? "Connexion..." : "Se connecter"}
         </Button>
       </form>
