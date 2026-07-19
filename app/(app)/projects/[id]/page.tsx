@@ -27,8 +27,8 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h2 className="font-heading text-lg font-bold tracking-tight">{project.name}</h2>
           <Link
             href={`/clients/${project.clients?.id}`}

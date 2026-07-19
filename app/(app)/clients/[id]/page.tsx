@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
+import { ClientTabsShell } from "@/components/clients/client-tabs-shell";
 import { SectionForm } from "@/components/clients/section-form";
 import {
   updateClientInfo,
@@ -68,17 +69,7 @@ export default async function ClientDetailPage({
         </div>
       </div>
 
-      <Tabs defaultValue="infos">
-        <TabsList>
-          <TabsTrigger value="infos">Infos générales</TabsTrigger>
-          <TabsTrigger value="avatar">Avatar client</TabsTrigger>
-          <TabsTrigger value="offre">Offre</TabsTrigger>
-          <TabsTrigger value="positionnement">Positionnement</TabsTrigger>
-          <TabsTrigger value="branding">Direction artistique</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="projets">Projets</TabsTrigger>
-        </TabsList>
-
+      <ClientTabsShell>
         <TabsContent value="infos" className="pt-4">
           <SectionForm
             action={updateClientInfo.bind(null, id)}
@@ -272,7 +263,7 @@ export default async function ClientDetailPage({
         <TabsContent value="projets" className="pt-4">
           <ProjectsTab clientId={id} projects={projects ?? []} />
         </TabsContent>
-      </Tabs>
+      </ClientTabsShell>
     </div>
   );
 }

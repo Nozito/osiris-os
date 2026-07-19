@@ -77,7 +77,7 @@ export default async function SettingsPage() {
         </Badge>
       </div>
 
-      <Tabs defaultValue="profil" orientation="vertical" className="sm:flex-row sm:gap-8">
+      <Tabs defaultValue="profil" orientation="vertical" className="flex-col gap-6 sm:flex-row sm:gap-8">
         <TabsList className="sm:w-44 sm:shrink-0 sm:items-stretch sm:border-0 sm:bg-transparent sm:p-0">
           <TabsTrigger value="profil">Profil</TabsTrigger>
           <TabsTrigger value="securite">Sécurité</TabsTrigger>
