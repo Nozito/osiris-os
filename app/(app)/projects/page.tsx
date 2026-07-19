@@ -38,6 +38,7 @@ export default async function ProjectsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        title="Projets"
         description={`${projects?.length ?? 0} projet${(projects?.length ?? 0) > 1 ? "s" : ""} en portefeuille de production.`}
         actions={<NewProjectDialog clients={clients ?? []} />}
       />

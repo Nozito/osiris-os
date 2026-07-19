@@ -70,7 +70,7 @@ export function NotificationsDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon-sm" className="relative h-7 w-7">
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (
               <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center rounded-full bg-primary px-1 text-[10px] glow-primary">

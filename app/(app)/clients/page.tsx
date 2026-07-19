@@ -25,6 +25,7 @@ export default async function ClientsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        title="Clients"
         description={`${clients?.length ?? 0} client${(clients?.length ?? 0) > 1 ? "s" : ""} au portefeuille.`}
         actions={<NewClientDialog />}
       />

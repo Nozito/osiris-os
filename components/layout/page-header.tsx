@@ -1,18 +1,19 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Replaces the old `page-title`/`page-subtitle` block. The topbar (see
- * app-topbar.tsx) already renders the page title as a breadcrumb, so this
- * component intentionally never repeats it — it only carries the
- * description, inline stats, tabs and actions that make each page distinct.
+ * The single owner of "what page is this" — there's no topbar breadcrumb
+ * anymore, so `title` is the one source of truth for the page name (keep it
+ * aligned with the sidebar rail's own labels, e.g. "Vue d'ensemble").
  */
 export function PageHeader({
+  title,
   description,
   meta,
   actions,
   tabs,
   className,
 }: {
+  title?: React.ReactNode;
   description?: React.ReactNode;
   meta?: React.ReactNode;
   actions?: React.ReactNode;
@@ -21,9 +22,14 @@ export function PageHeader({
 }) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      {(description || meta || actions) && (
+      {(title || description || meta || actions) && (
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
+            {title && (
+              <h1 className="font-heading text-xl font-bold tracking-tight text-balance">
+                {title}
+              </h1>
+            )}
             {description && (
               <p className="max-w-lg text-sm text-muted-foreground">{description}</p>
             )}

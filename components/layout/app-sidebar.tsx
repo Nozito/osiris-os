@@ -15,6 +15,7 @@ import {
   Search,
   ChevronsLeft,
   ChevronsRight,
+  X,
 } from "lucide-react";
 
 import {
@@ -30,6 +31,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { OsirisMark } from "@/components/layout/osiris-mark";
+import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
 import { useLogout } from "@/lib/use-logout";
 import { cn } from "@/lib/utils";
 
@@ -160,15 +162,18 @@ export function AppSidebar({
               Osiris <span className="text-primary">OS</span>
             </span>
           </Link>
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-(--duration-fast) hover:bg-sidebar-accent hover:text-foreground group-data-[collapsible=icon]:hidden"
-            title="Rechercher (⌘K)"
-          >
-            <Search className="h-3.5 w-3.5" />
-            <span className="sr-only">Rechercher</span>
-          </button>
+          <div className="flex shrink-0 items-center gap-0.5 group-data-[collapsible=icon]:hidden">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors duration-(--duration-fast) hover:bg-sidebar-accent hover:text-foreground"
+              title="Rechercher (⌘K)"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="sr-only">Rechercher</span>
+            </button>
+            <NotificationsDropdown />
+          </div>
         </div>
       </SidebarHeader>
 
@@ -225,7 +230,12 @@ export function AppSidebar({
           onClick={toggleSidebar}
           className="flex h-8 items-center justify-center gap-2 rounded-lg text-xs text-muted-foreground transition-colors duration-(--duration-fast) hover:bg-sidebar-accent hover:text-foreground"
         >
-          {collapsed ? (
+          {isMobile ? (
+            <>
+              <X className="h-3.5 w-3.5" />
+              <span>Fermer</span>
+            </>
+          ) : collapsed ? (
             <ChevronsRight className="h-3.5 w-3.5" />
           ) : (
             <>

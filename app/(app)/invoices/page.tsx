@@ -43,6 +43,7 @@ export default async function InvoicesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        title="Factures"
         description={`${invoices?.length ?? 0} facture${(invoices?.length ?? 0) > 1 ? "s" : ""} émise${(invoices?.length ?? 0) > 1 ? "s" : ""}.`}
         actions={<NewInvoiceDialog clients={clients ?? []} />}
       />

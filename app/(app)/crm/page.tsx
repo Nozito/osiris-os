@@ -31,6 +31,7 @@ export default async function CrmPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        title="CRM"
         description={`${items.length} lead${items.length > 1 ? "s" : ""} dans le pipeline commercial.`}
         actions={<NewLeadDialog />}
       />

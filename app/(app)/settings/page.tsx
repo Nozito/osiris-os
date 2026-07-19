@@ -24,7 +24,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader description="Votre compte et vos préférences." />
+      <PageHeader title="Paramètres" description="Votre compte et vos préférences." />
 
       <Tabs defaultValue="compte" orientation="vertical" className="sm:flex-row sm:gap-8">
         <TabsList className="sm:w-44 sm:shrink-0 sm:items-stretch sm:border-0 sm:bg-transparent sm:p-0">

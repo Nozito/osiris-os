@@ -35,6 +35,7 @@ export default async function QuotesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        title="Devis"
         description={`${quotes?.length ?? 0} devis émis.`}
         actions={<NewQuoteDialog clients={clients ?? []} />}
       />

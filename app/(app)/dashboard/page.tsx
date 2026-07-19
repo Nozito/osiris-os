@@ -13,7 +13,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader description="Indicateurs commerciaux, financiers et production en temps réel." />
+      <PageHeader
+        title="Vue d'ensemble"
+        description="Indicateurs commerciaux, financiers et production en temps réel."
+      />
 
       <Card className="relative overflow-hidden border-t-2 border-t-primary">
         <CardHeader className="flex-row items-start justify-between gap-4">
