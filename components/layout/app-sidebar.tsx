@@ -36,8 +36,6 @@ import { useLogout } from "@/lib/use-logout";
 import { cn } from "@/lib/utils";
 
 type SidebarCounts = {
-  leadsActifs: number;
-  projetsActifs: number;
   devisEnvoyes: number;
   facturesEnRetard: number;
 };
@@ -53,9 +51,9 @@ type NavItem = {
 /** The agency's real pipeline, in order — this order *is* the navigation's structure. */
 const STAGES: NavItem[] = [
   { title: "Vue d'ensemble", url: "/dashboard", icon: LayoutDashboard },
-  { title: "CRM", url: "/crm", icon: KanbanSquare, countKey: "leadsActifs" },
+  { title: "CRM", url: "/crm", icon: KanbanSquare },
   { title: "Clients", url: "/clients", icon: Users },
-  { title: "Projets", url: "/projects", icon: FolderKanban, countKey: "projetsActifs" },
+  { title: "Projets", url: "/projects", icon: FolderKanban },
   { title: "Devis", url: "/quotes", icon: FileText, countKey: "devisEnvoyes" },
   {
     title: "Factures",

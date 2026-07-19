@@ -4,20 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function getSidebarCounts() {
   const supabase = await createClient();
 
-  const [
-    { count: leadsActifs },
-    { count: projetsActifs },
-    { count: devisEnvoyes },
-    { count: facturesEnRetard },
-  ] = await Promise.all([
-    supabase
-      .from("leads")
-      .select("*", { count: "exact", head: true })
-      .not("status", "in", "(signed,lost)"),
-    supabase
-      .from("projects")
-      .select("*", { count: "exact", head: true })
-      .not("status", "in", "(live,maintenance)"),
+  const [{ count: devisEnvoyes }, { count: facturesEnRetard }] = await Promise.all([
     supabase
       .from("quotes")
       .select("*", { count: "exact", head: true })
@@ -29,8 +16,6 @@ export async function getSidebarCounts() {
   ]);
 
   return {
-    leadsActifs: leadsActifs ?? 0,
-    projetsActifs: projetsActifs ?? 0,
     devisEnvoyes: devisEnvoyes ?? 0,
     facturesEnRetard: facturesEnRetard ?? 0,
   };
