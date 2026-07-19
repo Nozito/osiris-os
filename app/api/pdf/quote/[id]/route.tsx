@@ -12,7 +12,9 @@ export async function GET(
 
   const { data: quote } = await supabase
     .from("quotes")
-    .select("*, clients(company_name, contact_name, address, email), quote_items(*)")
+    .select(
+      "*, clients(company_name, contact_name, address, email), quote_items(*), created_by:profiles(full_name), projects(name)"
+    )
     .eq("id", id)
     .single();
 
@@ -34,6 +36,8 @@ export async function GET(
       signedAt={quote.signed_at}
       client={quote.clients!}
       items={items}
+      commercialName={quote.created_by?.full_name ?? null}
+      projectName={quote.projects?.name ?? null}
     />
   );
 

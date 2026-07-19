@@ -34,8 +34,8 @@ export const STATUS_TONES = {
 
 export const styles = StyleSheet.create({
   page: {
-    padding: 48,
-    paddingBottom: 64,
+    padding: 42,
+    paddingBottom: 54,
     fontSize: 9.5,
     fontFamily: "Helvetica",
     color: INK,
@@ -44,33 +44,33 @@ export const styles = StyleSheet.create({
   // Header — centered logo + kicker + title, mirrors the reference template's brand block.
   headerWrap: {
     alignItems: "center",
-    marginBottom: 22,
+    marginBottom: 16,
   },
   logo: {
-    width: 34,
-    height: 34,
-    marginBottom: 10,
+    width: 32,
+    height: 32,
+    marginBottom: 8,
   },
   kicker: {
     fontSize: 8,
     letterSpacing: 2.5,
     color: MUTED,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   docTitle: {
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: 700,
     letterSpacing: 6,
   },
   titleRule: {
-    marginTop: 10,
+    marginTop: 9,
     width: "36%",
     borderTopWidth: 2,
     borderTopColor: ACCENT,
   },
 
   statusBadge: {
-    marginTop: 12,
+    marginTop: 9,
     alignSelf: "center",
     paddingVertical: 3,
     paddingHorizontal: 10,
@@ -80,38 +80,46 @@ export const styles = StyleSheet.create({
   },
 
   // Meta row — number / date / due date, right-aligned like the reference.
+  // The document number carries the most weight: it's what a client reads
+  // back over the phone or types into an accounting tool, so it can't be
+  // the same visual weight as the rest of the metadata.
   metaRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 18,
-    marginTop: 18,
-    marginBottom: 18,
+    flexWrap: "wrap",
+    gap: 16,
+    marginTop: 14,
+    marginBottom: 14,
     fontSize: 8.5,
   },
   metaLabel: {
     color: MUTED,
+  },
+  metaNumberValue: {
+    fontWeight: 700,
+    fontSize: 10,
   },
 
   // Emitter / client cards.
   cardGrid: {
     flexDirection: "row",
     gap: 16,
-    marginBottom: 18,
+    marginBottom: 14,
   },
   card: {
     flex: 1,
     borderWidth: 1,
     borderColor: RULE,
     borderRadius: 3,
-    padding: 12,
+    padding: 10,
   },
   cardLabel: {
     fontSize: 7.5,
     letterSpacing: 2,
     fontWeight: 700,
     color: MUTED,
-    marginBottom: 8,
-    paddingBottom: 6,
+    marginBottom: 6,
+    paddingBottom: 5,
     borderBottomWidth: 1,
     borderBottomColor: RULE,
   },
@@ -122,16 +130,32 @@ export const styles = StyleSheet.create({
     fontWeight: 700,
     marginBottom: 3,
   },
+  cardDivider: {
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: RULE,
+  },
+  cardContactLabel: {
+    fontSize: 7,
+    letterSpacing: 1,
+    color: FAINT,
+    marginBottom: 2,
+  },
 
-  // Items table.
+  // Items table. A light header fill (not a hard black rule) reads as more
+  // premium and stays print-safe — it survives grayscale printing as a
+  // faint gray band instead of relying purely on a border for structure.
   table: {
-    marginTop: 4,
+    marginTop: 2,
   },
   tableHeaderRow: {
     flexDirection: "row",
+    backgroundColor: "#f7f7f8",
     borderBottomWidth: 1,
-    borderBottomColor: INK,
-    paddingBottom: 6,
+    borderBottomColor: RULE,
+    paddingVertical: 6,
+    paddingHorizontal: 6,
   },
   tableHeaderCell: {
     fontSize: 7.5,
@@ -143,7 +167,8 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: RULE,
-    paddingVertical: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 6,
   },
   colLabel: { flex: 4 },
   colQty: { flex: 0.8, textAlign: "right" },
@@ -158,11 +183,20 @@ export const styles = StyleSheet.create({
     fontWeight: 700,
   },
 
+  // Total block: a bounded, lightly tinted box (not a full-bleed color fill)
+  // so the final amount is unmistakable at a glance without turning the
+  // page into a poster — stays legible in grayscale printing too.
   totalRowFinal: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 10,
+    marginTop: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    backgroundColor: "#f3f7ff",
+    borderWidth: 1,
+    borderColor: "#dbe6fa",
+    borderRadius: 3,
   },
   totalFinalLabel: {
     fontSize: 8.5,
@@ -172,6 +206,7 @@ export const styles = StyleSheet.create({
   totalFinalValue: {
     fontSize: 15,
     fontWeight: 700,
+    color: INK,
   },
   vatMention: {
     fontSize: 7.5,
@@ -181,7 +216,7 @@ export const styles = StyleSheet.create({
     marginTop: 6,
   },
 
-  // Secondary total breakdown (HT/TVA) — used when the header total isn't standalone.
+  // Secondary total breakdown (HT/TVA) sits above the highlighted TTC box.
   totals: {
     marginTop: 4,
     alignItems: "flex-end",
@@ -193,24 +228,16 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
     fontSize: 9,
   },
-  totalTtc: {
-    fontWeight: 700,
-    fontSize: 12,
-    borderTopWidth: 1,
-    borderTopColor: INK,
-    paddingTop: 5,
-    marginTop: 5,
-  },
 
   section: {
-    marginTop: 22,
+    marginTop: 16,
   },
   sectionTitle: {
     fontSize: 9,
     letterSpacing: 2.5,
     fontWeight: 700,
-    marginBottom: 8,
-    paddingBottom: 5,
+    marginBottom: 6,
+    paddingBottom: 4,
     borderBottomWidth: 2,
     borderBottomColor: INK,
   },
@@ -219,7 +246,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: RULE,
     borderRadius: 3,
-    padding: 12,
+    padding: 10,
     fontSize: 8.5,
     lineHeight: 1.5,
     color: "#333333",
@@ -228,27 +255,27 @@ export const styles = StyleSheet.create({
   signGrid: {
     flexDirection: "row",
     gap: 20,
-    marginTop: 24,
+    marginTop: 16,
   },
   signBox: {
     flex: 1,
     borderWidth: 1,
     borderColor: RULE,
     borderRadius: 3,
-    height: 60,
-    padding: 10,
+    height: 46,
+    padding: 8,
     fontSize: 8,
     color: MUTED,
   },
   signedNotice: {
-    marginTop: 24,
+    marginTop: 16,
     fontSize: 8.5,
     color: "#333333",
     borderWidth: 1,
     borderColor: STATUS_TONES.success.bg,
     backgroundColor: STATUS_TONES.success.bg,
     borderRadius: 3,
-    padding: 10,
+    padding: 8,
   },
 
   footer: {

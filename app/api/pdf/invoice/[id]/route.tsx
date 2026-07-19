@@ -12,7 +12,9 @@ export async function GET(
 
   const { data: invoice } = await supabase
     .from("invoices")
-    .select("*, clients(company_name, contact_name, address, email), invoice_items(*)")
+    .select(
+      "*, clients(company_name, contact_name, address, email), invoice_items(*), created_by:profiles(full_name), quotes(projects(name))"
+    )
     .eq("id", id)
     .single();
 
@@ -31,6 +33,8 @@ export async function GET(
       vatRate={invoice.vat_rate}
       client={invoice.clients!}
       items={items}
+      commercialName={invoice.created_by?.full_name ?? null}
+      projectName={invoice.quotes?.projects?.name ?? null}
     />
   );
 

@@ -31,6 +31,9 @@ type QuotePdfProps = {
     email: string | null;
   };
   items: { label: string; description: string | null; quantity: number; unit_price: number }[];
+  /** Salesperson in charge — always shown in the ÉMETTEUR card, never a lone footer line. */
+  commercialName?: string | null;
+  projectName?: string | null;
 };
 
 export function QuoteDocument({
@@ -44,6 +47,8 @@ export function QuoteDocument({
   signedAt,
   client,
   items,
+  commercialName,
+  projectName,
 }: QuotePdfProps) {
   const totals = computeTotals(items, vatRate);
   const tone = STATUS_TONES[STATUS_TONE[status] ?? "secondary"];
@@ -71,7 +76,7 @@ export function QuoteDocument({
         <View style={styles.metaRow}>
           <Text>
             <Text style={styles.metaLabel}>N° </Text>
-            {number}
+            <Text style={styles.metaNumberValue}>{number}</Text>
           </Text>
           {issuedAt && (
             <Text>
@@ -85,6 +90,12 @@ export function QuoteDocument({
               {new Date(validUntil).toLocaleDateString("fr-FR")}
             </Text>
           )}
+          {projectName && (
+            <Text>
+              <Text style={styles.metaLabel}>Réf. projet </Text>
+              {projectName}
+            </Text>
+          )}
         </View>
 
         <View style={styles.cardGrid}>
@@ -92,6 +103,12 @@ export function QuoteDocument({
             <Text style={styles.cardLabel}>ÉMETTEUR</Text>
             <Text style={styles.cardLineStrong}>Osiris Agency</Text>
             <Text style={styles.cardLine}>contact@osiris-agency.fr</Text>
+            {commercialName && (
+              <View style={styles.cardDivider}>
+                <Text style={styles.cardContactLabel}>VOTRE CONTACT</Text>
+                <Text style={styles.cardLineStrong}>{commercialName}</Text>
+              </View>
+            )}
           </View>
           <View style={styles.card}>
             <Text style={styles.cardLabel}>CLIENT</Text>
