@@ -223,6 +223,61 @@ export type Database = {
           },
         ]
       }
+      document_requests: {
+        Row: {
+          client_id: string
+          created_at: string
+          fulfilled_document_id: string | null
+          id: string
+          label: string
+          note: string | null
+          requested_by: string | null
+          status: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          fulfilled_document_id?: string | null
+          id?: string
+          label: string
+          note?: string | null
+          requested_by?: string | null
+          status?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          fulfilled_document_id?: string | null
+          id?: string
+          label?: string
+          note?: string | null
+          requested_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_requests_fulfilled_document_id_fkey"
+            columns: ["fulfilled_document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: Database["public"]["Enums"]["document_category"]
@@ -233,8 +288,12 @@ export type Database = {
           id: string
           project_id: string | null
           size_bytes: number | null
+          source: string
+          stage: string | null
           storage_path: string
           uploaded_by: string | null
+          viewed_by_client_at: string | null
+          visibility: string
         }
         Insert: {
           category?: Database["public"]["Enums"]["document_category"]
@@ -245,8 +304,12 @@ export type Database = {
           id?: string
           project_id?: string | null
           size_bytes?: number | null
+          source?: string
+          stage?: string | null
           storage_path: string
           uploaded_by?: string | null
+          viewed_by_client_at?: string | null
+          visibility?: string
         }
         Update: {
           category?: Database["public"]["Enums"]["document_category"]
@@ -257,8 +320,12 @@ export type Database = {
           id?: string
           project_id?: string | null
           size_bytes?: number | null
+          source?: string
+          stage?: string | null
           storage_path?: string
           uploaded_by?: string | null
+          viewed_by_client_at?: string | null
+          visibility?: string
         }
         Relationships: [
           {
@@ -278,6 +345,70 @@ export type Database = {
           {
             foreignKeyName: "documents_uploaded_by_fkey"
             columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          client_id: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_at: string
+          invited_by: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          client_id?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          profile_id?: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          client_id?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          profile_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_profile_id_fkey"
+            columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -794,6 +925,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      document_path_visible_to_client: {
+        Args: { path: string }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       owns_client: { Args: { target_client_id: string }; Returns: boolean }
     }

@@ -6,7 +6,7 @@ const CLIENT_PREFIXES = ["/client"];
 const PUBLIC_PREFIXES = ["/login"];
 // Reset-password briefly creates an authenticated (recovery) session before the
 // user has set a new password — never bounce these away like /login does.
-const AUTH_ACTION_PREFIXES = ["/forgot-password", "/reset-password"];
+const AUTH_ACTION_PREFIXES = ["/forgot-password", "/reset-password", "/accept-invite"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

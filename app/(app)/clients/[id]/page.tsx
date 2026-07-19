@@ -12,8 +12,10 @@ import {
 } from "../actions";
 import { ProjectsTab } from "@/components/clients/projects-tab";
 import { DocumentsTab } from "@/components/clients/documents-tab";
+import { ClientSummaryTab } from "@/components/clients/client-summary-tab";
 import { AiOfferPanelLazy } from "@/components/clients/ai-offer-panel-lazy";
 import { AiWebStrategyPanelLazy } from "@/components/clients/ai-web-strategy-panel-lazy";
+import { getClientInvitation } from "../invite-actions";
 
 export default async function ClientDetailPage({
   params,
@@ -23,24 +25,61 @@ export default async function ClientDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: client }, { data: profile }, { data: branding }, { data: projects }, { data: documents }] =
-    await Promise.all([
-      supabase.from("clients").select("*").eq("id", id).single(),
-      supabase.from("client_business_profiles").select("*").eq("client_id", id).maybeSingle(),
-      supabase.from("client_branding").select("*").eq("client_id", id).maybeSingle(),
-      supabase
-        .from("projects")
-        .select("id, name, status, budget, delivery_date")
-        .eq("client_id", id)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("documents")
-        .select("id, file_name, file_type, category, created_at, storage_path")
-        .eq("client_id", id)
-        .order("created_at", { ascending: false }),
-    ]);
+  const [
+    { data: client },
+    { data: profile },
+    { data: branding },
+    { data: projects },
+    { data: documents },
+    { data: documentRequests },
+    invitation,
+  ] = await Promise.all([
+    supabase.from("clients").select("*").eq("id", id).single(),
+    supabase.from("client_business_profiles").select("*").eq("client_id", id).maybeSingle(),
+    supabase.from("client_branding").select("*").eq("client_id", id).maybeSingle(),
+    supabase
+      .from("projects")
+      .select("id, name, status, budget, delivery_date")
+      .eq("client_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("documents")
+      .select(
+        "id, file_name, file_type, category, created_at, storage_path, visibility, stage, source, viewed_by_client_at"
+      )
+      .eq("client_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("document_requests")
+      .select("id, label, note, status, created_at")
+      .eq("client_id", id)
+      .order("created_at", { ascending: false }),
+    getClientInvitation(id),
+  ]);
 
   if (!client) notFound();
+
+  const onboardingSteps = [
+    { label: "Entreprise", complete: Boolean(client.contact_name && client.email) },
+    {
+      label: "Avatar & offre",
+      complete: Boolean(profile?.ideal_client && (profile?.services as string[] | null)?.length),
+    },
+    { label: "Positionnement", complete: Boolean(profile?.promise) },
+    {
+      label: "Direction artistique",
+      complete: Boolean((branding?.colors as string[] | null)?.length || branding?.logo_url),
+    },
+  ];
+
+  const docs = documents ?? [];
+  const requests = documentRequests ?? [];
+  const documentStats = {
+    visibleCount: docs.filter((d) => d.visibility === "client_visible").length,
+    internalCount: docs.filter((d) => d.visibility === "internal").length,
+    clientProvidedCount: docs.filter((d) => d.source === "client").length,
+    pendingRequestsCount: requests.filter((r) => r.status === "pending").length,
+  };
 
   return (
     <div className="space-y-6">
@@ -70,6 +109,16 @@ export default async function ClientDetailPage({
       </div>
 
       <ClientTabsShell>
+        <TabsContent value="resume" className="pt-4">
+          <ClientSummaryTab
+            clientId={id}
+            clientEmail={client.email}
+            invitation={invitation}
+            onboardingSteps={onboardingSteps}
+            documentStats={documentStats}
+          />
+        </TabsContent>
+
         <TabsContent value="infos" className="pt-4">
           <SectionForm
             action={updateClientInfo.bind(null, id)}
@@ -257,7 +306,12 @@ export default async function ClientDetailPage({
         </TabsContent>
 
         <TabsContent value="documents" className="pt-4">
-          <DocumentsTab clientId={id} documents={documents ?? []} />
+          <DocumentsTab
+            clientId={id}
+            documents={documents ?? []}
+            documentRequests={documentRequests ?? []}
+            viewerRole="staff"
+          />
         </TabsContent>
 
         <TabsContent value="projets" className="pt-4">

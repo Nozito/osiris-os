@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 
 const TAB_ITEMS = [
+  { value: "resume", label: "Résumé" },
   { value: "infos", label: "Infos générales" },
   { value: "avatar", label: "Avatar client" },
   { value: "offre", label: "Offre" },
@@ -24,7 +25,7 @@ const TAB_ITEMS = [
  * doigt : sur mobile la navigation devient un Select pleine largeur, le
  * contenu (TabsContent) reste unique et partage le meme etat controle. */
 export function ClientTabsShell({ children }: { children: React.ReactNode }) {
-  const [value, setValue] = useState("infos");
+  const [value, setValue] = useState("resume");
 
   return (
     <Tabs value={value} onValueChange={(v) => v && setValue(v)}>

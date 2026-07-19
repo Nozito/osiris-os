@@ -18,11 +18,23 @@ export default async function ClientDocumentsPage() {
   }
 
   const supabase = await createClient();
-  const { data: documents } = await supabase
-    .from("documents")
-    .select("id, file_name, file_type, category, created_at, storage_path")
-    .eq("client_id", client.id)
-    .order("created_at", { ascending: false });
+  const [{ data: documents }, { data: documentRequests }] = await Promise.all([
+    // RLS (documents_select_own, 0013_invitations_and_documents.sql) already
+    // excludes internal documents — no extra filtering needed here.
+    supabase
+      .from("documents")
+      .select(
+        "id, file_name, file_type, category, created_at, storage_path, visibility, stage, source, viewed_by_client_at"
+      )
+      .eq("client_id", client.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("document_requests")
+      .select("id, label, note, status, created_at")
+      .eq("client_id", client.id)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -32,7 +44,12 @@ export default async function ClientDocumentsPage() {
           Devis, factures, contrats et fichiers partagés avec Osiris Agency.
         </p>
       </div>
-      <DocumentsTab clientId={client.id} documents={documents ?? []} />
+      <DocumentsTab
+        clientId={client.id}
+        documents={documents ?? []}
+        documentRequests={documentRequests ?? []}
+        viewerRole="client"
+      />
     </div>
   );
 }

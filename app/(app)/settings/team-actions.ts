@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/require-admin";
+import { createInvitation, resendInvitation, revokeInvitation } from "@/lib/invitations";
 import type { Database } from "@/types/database.types";
 
 export type ActionState = { error?: string; success?: boolean } | undefined;
@@ -20,8 +21,9 @@ export async function inviteTeamMember(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
+  let adminUser: { id: string };
   try {
-    await requireAdmin();
+    adminUser = await requireAdmin();
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Action non autorisée." };
   }
@@ -35,26 +37,58 @@ export async function inviteTeamMember(
     return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
   }
 
-  const admin = createAdminClient();
-  const { data: invited, error } = await admin.auth.admin.inviteUserByEmail(parsed.data.email, {
-    data: { full_name: parsed.data.full_name },
+  const result = await createInvitation({
+    email: parsed.data.email,
+    fullName: parsed.data.full_name,
+    role: parsed.data.role,
+    invitedBy: adminUser.id,
   });
 
-  if (error || !invited.user) {
-    if (error?.message.toLowerCase().includes("already been registered")) {
-      return { error: "Cet email a déjà un compte." };
-    }
-    return { error: "Impossible d'envoyer l'invitation." };
+  if (!result.ok) return { error: result.error };
+
+  revalidatePath("/settings");
+  return { success: true };
+}
+
+export async function resendTeamInvite(invitationId: string): Promise<ActionState> {
+  try {
+    await requireAdmin();
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Action non autorisée." };
   }
 
-  // The trigger that creates the profile row defaults role to 'client' —
-  // promote it to what was actually selected in the invite form.
-  const { error: roleError } = await admin
-    .from("profiles")
-    .update({ role: parsed.data.role, full_name: parsed.data.full_name })
-    .eq("id", invited.user.id);
+  const admin = createAdminClient();
+  const { data: invitation } = await admin
+    .from("invitations")
+    .select("*")
+    .eq("id", invitationId)
+    .single();
+  if (!invitation) return { error: "Invitation introuvable." };
 
-  if (roleError) return { error: "Invitation envoyée, mais le rôle n'a pas pu être appliqué." };
+  const result = await resendInvitation(invitation);
+  if (!result.ok) return { error: result.error };
+
+  revalidatePath("/settings");
+  return { success: true };
+}
+
+export async function revokeTeamInvite(invitationId: string): Promise<ActionState> {
+  try {
+    await requireAdmin();
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Action non autorisée." };
+  }
+
+  const admin = createAdminClient();
+  const { data: invitation } = await admin
+    .from("invitations")
+    .select("*")
+    .eq("id", invitationId)
+    .single();
+  if (!invitation) return { error: "Invitation introuvable." };
+
+  const result = await revokeInvitation(invitation);
+  if (!result.ok) return { error: result.error };
 
   revalidatePath("/settings");
   return { success: true };

@@ -35,12 +35,34 @@ async function getTeamMembers() {
     if (u.email) emailById.set(u.id, u.email);
   }
 
-  return profiles.map((p) => ({
-    id: p.id,
-    full_name: p.full_name,
-    role: p.role as "admin" | "employee",
-    email: emailById.get(p.id) ?? null,
-  }));
+  // The profiles row is created the instant the invite email is sent (a DB
+  // trigger on auth.users insert), so it can't tell "invited, never opened
+  // the link" from "active" on its own — join the invitations row to know.
+  const { data: invitations } = await supabase
+    .from("invitations")
+    .select("id, profile_id, status, expires_at")
+    .in("role", ["admin", "employee"])
+    .neq("status", "revoked");
+  const invitationByProfileId = new Map((invitations ?? []).map((inv) => [inv.profile_id, inv]));
+
+  return profiles.map((p) => {
+    const invitation = invitationByProfileId.get(p.id);
+    const status: "pending" | "expired" | "accepted" =
+      !invitation || invitation.status === "accepted"
+        ? "accepted"
+        : new Date(invitation.expires_at) < new Date()
+          ? "expired"
+          : "pending";
+
+    return {
+      id: p.id,
+      full_name: p.full_name,
+      role: p.role as "admin" | "employee",
+      email: emailById.get(p.id) ?? null,
+      status,
+      invitationId: invitation?.id ?? null,
+    };
+  });
 }
 
 export default async function SettingsPage() {

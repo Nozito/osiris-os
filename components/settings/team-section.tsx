@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { UserPlus, X } from "lucide-react";
+import { UserPlus, X, RotateCw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { inviteTeamMember, updateMemberRole, removeTeamMember } from "@/app/(app)/settings/team-actions";
+import {
+  inviteTeamMember,
+  updateMemberRole,
+  removeTeamMember,
+  resendTeamInvite,
+  revokeTeamInvite,
+} from "@/app/(app)/settings/team-actions";
 
 type Role = "admin" | "employee";
-type Member = { id: string; full_name: string | null; role: Role; email?: string | null };
+type InviteStatus = "pending" | "expired" | "accepted";
+type Member = {
+  id: string;
+  full_name: string | null;
+  role: Role;
+  email?: string | null;
+  status: InviteStatus;
+  invitationId: string | null;
+};
 
 const ROLE_LABELS: Record<Role, string> = { admin: "Administrateur", employee: "Collaborateur" };
+
+const STATUS_BADGE: Record<InviteStatus, { label: string; variant: "secondary" | "outline" }> = {
+  pending: { label: "Invitation envoyée", variant: "outline" },
+  expired: { label: "Invitation expirée", variant: "outline" },
+  accepted: { label: "Actif", variant: "secondary" },
+};
 
 function InviteDialog() {
   const [open, setOpen] = useState(false);
@@ -98,6 +118,7 @@ function MemberRow({ member, currentUserId }: { member: Member; currentUserId: s
   const [isPending, startTransition] = useTransition();
   const isSelf = member.id === currentUserId;
   const initials = (member.full_name || member.email || "?").slice(0, 2).toUpperCase();
+  const badge = STATUS_BADGE[member.status];
 
   function handleRoleChange(value: string | null) {
     if (!value || value === member.role) return;
@@ -121,6 +142,29 @@ function MemberRow({ member, currentUserId }: { member: Member; currentUserId: s
     });
   }
 
+  function handleResend() {
+    if (!member.invitationId) return;
+    startTransition(async () => {
+      const result = await resendTeamInvite(member.invitationId!);
+      if (result?.error) toast.error(result.error);
+      else toast.success("Invitation renvoyée.");
+    });
+  }
+
+  function handleRevoke() {
+    if (!member.invitationId) return;
+    startTransition(async () => {
+      const result = await revokeTeamInvite(member.invitationId!);
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Invitation annulée.");
+    });
+  }
+
+  const isPendingInvite = member.status === "pending" || member.status === "expired";
+
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border p-3">
       <Avatar className="h-8 w-8 shrink-0">
@@ -130,15 +174,36 @@ function MemberRow({ member, currentUserId }: { member: Member; currentUserId: s
         <p className="truncate text-sm font-medium">
           {member.full_name || "—"} {isSelf && <span className="text-muted-foreground">(vous)</span>}
         </p>
-        {member.email && (
-          <p className="truncate text-xs text-muted-foreground">{member.email}</p>
-        )}
+        <div className="flex items-center gap-1.5">
+          {member.email && (
+            <p className="truncate text-xs text-muted-foreground">{member.email}</p>
+          )}
+          {member.status !== "accepted" && (
+            <Badge variant={badge.variant} className="shrink-0 text-[10px]">
+              {badge.label}
+            </Badge>
+          )}
+        </div>
       </div>
 
       {isSelf ? (
         <Badge variant="secondary">{ROLE_LABELS[member.role]}</Badge>
       ) : (
         <>
+          {isPendingInvite && member.invitationId && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              disabled={isPending}
+              onClick={handleResend}
+              title="Renvoyer l'invitation"
+            >
+              <RotateCw className="h-3.5 w-3.5" />
+              <span className="sr-only">Renvoyer</span>
+            </Button>
+          )}
+
           <Select value={member.role} onValueChange={handleRoleChange} disabled={isPending}>
             <SelectTrigger size="sm" className="w-40">
               <SelectValue />
@@ -149,38 +214,53 @@ function MemberRow({ member, currentUserId }: { member: Member; currentUserId: s
             </SelectContent>
           </Select>
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger
-              render={
-                <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive" />
-              }
+          {isPendingInvite && member.invitationId ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground hover:text-destructive"
+              disabled={isPending}
+              onClick={handleRevoke}
+              title="Annuler l'invitation"
             >
               <X className="h-3.5 w-3.5" />
-              <span className="sr-only">Retirer l&apos;accès</span>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-sm">
-              <DialogHeader>
-                <DialogTitle>Retirer l&apos;accès de {member.full_name || "ce membre"} ?</DialogTitle>
-              </DialogHeader>
-              <p className="text-sm text-muted-foreground">
-                Cette action supprime définitivement son compte. Il ne pourra plus se connecter.
-              </p>
-              <div className="flex gap-2">
-                <DialogClose render={<Button type="button" variant="outline" className="flex-1" />}>
-                  Annuler
-                </DialogClose>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="flex-1"
-                  disabled={isPending}
-                  onClick={handleRemove}
-                >
-                  {isPending ? "Retrait..." : "Retirer l'accès"}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              <span className="sr-only">Annuler l&apos;invitation</span>
+            </Button>
+          ) : (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger
+                render={
+                  <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-destructive" />
+                }
+              >
+                <X className="h-3.5 w-3.5" />
+                <span className="sr-only">Retirer l&apos;accès</span>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-sm">
+                <DialogHeader>
+                  <DialogTitle>Retirer l&apos;accès de {member.full_name || "ce membre"} ?</DialogTitle>
+                </DialogHeader>
+                <p className="text-sm text-muted-foreground">
+                  Cette action supprime définitivement son compte. Il ne pourra plus se connecter.
+                </p>
+                <div className="flex gap-2">
+                  <DialogClose render={<Button type="button" variant="outline" className="flex-1" />}>
+                    Annuler
+                  </DialogClose>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="flex-1"
+                    disabled={isPending}
+                    onClick={handleRemove}
+                  >
+                    {isPending ? "Retrait..." : "Retirer l'accès"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </>
       )}
     </div>

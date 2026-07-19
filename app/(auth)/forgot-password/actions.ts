@@ -1,21 +1,12 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteOrigin } from "@/lib/get-site-origin";
 
 export type ForgotPasswordState = { error?: string; sent?: boolean } | undefined;
 
 const emailSchema = z.string().trim().email();
-
-async function getSiteOrigin() {
-  const h = await headers();
-  const origin = h.get("origin");
-  if (origin) return origin;
-  const host = h.get("host");
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-  return `${protocol}://${host}`;
-}
 
 export async function requestPasswordReset(
   _prevState: ForgotPasswordState,
