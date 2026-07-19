@@ -34,14 +34,22 @@ export function useAuthTransition() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-/** Plays the logo draw-in (login) or draw-out (logout) overlay and resolves once it's done. */
+/**
+ * Plays the logo draw-in (login) or draw-out (logout) animation and
+ * resolves once it's done — the overlay stays up (covering the still-
+ * mounted old page) until the caller navigates and calls
+ * `endAuthTransition()`, so the previous screen never flashes back into
+ * view before the new route is ready.
+ */
 export function playAuthTransition(mode: "in" | "out") {
   setState({ visible: true, mode });
   const duration = mode === "in" ? DRAW_MS : ERASE_MS;
   return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      setState({ visible: false, mode });
-      resolve();
-    }, duration);
+    setTimeout(resolve, duration);
   });
+}
+
+/** Hides the overlay — call once the destination route has had a moment to mount. */
+export function endAuthTransition() {
+  setState({ visible: false, mode: state.mode });
 }

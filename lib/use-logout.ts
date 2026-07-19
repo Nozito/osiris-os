@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
-import { playAuthTransition } from "@/lib/auth-transition";
+import { playAuthTransition, endAuthTransition } from "@/lib/auth-transition";
 import { signOut } from "@/app/(auth)/login/actions";
 
 /** Plays the logo draw-out transition, then signs out and navigates to /login. */
@@ -17,5 +17,6 @@ export function useLogout() {
     await signOut();
     router.push("/login");
     router.refresh();
+    setTimeout(endAuthTransition, 400);
   };
 }

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OsirisMark } from "@/components/layout/osiris-mark";
-import { playAuthTransition } from "@/lib/auth-transition";
+import { playAuthTransition, endAuthTransition } from "@/lib/auth-transition";
 import { signIn } from "./actions";
 
 export default function LoginPage() {
@@ -20,6 +20,7 @@ export default function LoginPage() {
     playAuthTransition("in").then(() => {
       router.push("/dashboard");
       router.refresh();
+      setTimeout(endAuthTransition, 400);
     });
   }, [state, router]);
 
