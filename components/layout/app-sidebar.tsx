@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -125,16 +126,29 @@ export function AppSidebar({
   userName = "Utilisateur",
   userRoleLabel,
   counts,
+  hasStoredSidebarPreference = false,
 }: {
   userName?: string;
   userRoleLabel?: string;
   counts?: SidebarCounts;
+  hasStoredSidebarPreference?: boolean;
 }) {
   const pathname = usePathname();
-  const { state, toggleSidebar, isMobile } = useSidebar();
+  const { state, toggleSidebar, isMobile, open, setOpen } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
   const logout = useLogout();
   const shouldReduceMotion = useReducedMotion();
+
+  // Tablet gets its own default, not desktop shrunk: if the user never made
+  // an explicit choice (no cookie yet), start collapsed to icon-rail in the
+  // tablet width range so content isn't squeezed by a full-width sidebar.
+  // Runs once — after that the user's own toggle sets the cookie and wins.
+  useEffect(() => {
+    if (hasStoredSidebarPreference || isMobile || !open) return;
+    const isTabletWidth = window.innerWidth >= 768 && window.innerWidth < 1100;
+    if (isTabletWidth) setOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function isItemActive(url: string) {
     return pathname === url || pathname.startsWith(`${url}/`);

@@ -2,6 +2,17 @@
 
 import { Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/validations/lead";
+import type { Database } from "@/types/database.types";
+
+type LeadStatus = Database["public"]["Enums"]["lead_status"];
 
 type LeadCardData = {
   id: string;
@@ -10,6 +21,7 @@ type LeadCardData = {
   budget: number | null;
   urgency: string | null;
   totalScore: number | null;
+  status: LeadStatus;
 };
 
 function scoreStyles(score: number | null) {
@@ -33,23 +45,35 @@ function initials(name: string) {
 export function LeadCard({
   lead,
   onClick,
+  onStatusChange,
   draggable,
   onDragStart,
   onDragEnd,
 }: {
   lead: LeadCardData;
   onClick: () => void;
+  /** Native HTML5 drag-and-drop (desktop reordering) doesn't work on touch
+   * devices — this select is how tablet/mobile users change a lead's stage
+   * without dragging. */
+  onStatusChange: (status: LeadStatus) => void;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
 }) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       draggable={draggable}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className="group/lead-card w-full cursor-grab rounded-lg border border-border bg-card p-3 text-left shadow-[var(--shadow-xs)] transition-[border-color,box-shadow,transform] duration-(--duration-fast) ease-(--ease-premium) hover:-translate-y-[1px] hover:border-white/[0.16] hover:shadow-[var(--shadow-sm)] active:cursor-grabbing active:scale-[0.99]"
     >
       <div className="flex items-start justify-between gap-2">
@@ -87,6 +111,28 @@ export function LeadCard({
           </span>
         </div>
       )}
-    </button>
+
+      <div
+        className="mt-2 border-t border-border pt-2"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Select value={lead.status} onValueChange={(v) => v && onStatusChange(v as LeadStatus)}>
+          <SelectTrigger
+            size="sm"
+            className="h-6 w-full gap-1 border-none bg-white/[0.03] px-1.5 text-[10.5px] text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {LEAD_STATUSES.map((status) => (
+              <SelectItem key={status} value={status}>
+                {LEAD_STATUS_LABELS[status]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   );
 }

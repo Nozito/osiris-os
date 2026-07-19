@@ -16,7 +16,9 @@ export default async function AppLayout({
     getSidebarCounts(),
     getCurrentAccount(),
   ]);
-  const sidebarOpen = cookieStore.get("sidebar_state")?.value !== "false";
+  const sidebarCookie = cookieStore.get("sidebar_state");
+  const sidebarOpen = sidebarCookie?.value !== "false";
+  const hasStoredSidebarPreference = sidebarCookie !== undefined;
 
   return (
     <SidebarProvider defaultOpen={sidebarOpen}>
@@ -24,6 +26,7 @@ export default async function AppLayout({
         userName={account?.name}
         userRoleLabel={account?.roleLabel}
         counts={counts}
+        hasStoredSidebarPreference={hasStoredSidebarPreference}
       />
       <SidebarInset className="bg-transparent">
         <main className="flex-1 p-6 pb-20 md:pb-6">

@@ -165,6 +165,7 @@ export function KanbanBoard({
                             budget: lead.budget,
                             urgency: lead.urgency,
                             totalScore: lead.scores?.total_score ?? null,
+                            status: lead.status as LeadStatus,
                           }}
                           draggable
                           onDragStart={(e) => {
@@ -176,6 +177,7 @@ export function KanbanBoard({
                             setDragOverColumn(null);
                           }}
                           onClick={() => setSelected(lead)}
+                          onStatusChange={(nextStatus) => moveLead(lead.id, nextStatus)}
                         />
                       </div>
                     ))

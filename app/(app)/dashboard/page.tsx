@@ -74,8 +74,8 @@ export default async function DashboardPage() {
         <ProjectsInProgress projects={projects} />
       </div>
 
-      <div className="order-4 grid grid-cols-1 gap-4 md:order-3 lg:grid-cols-3">
-        <Card className="relative overflow-hidden border-t-2 border-t-primary lg:col-span-2">
+      <div className="order-4 grid grid-cols-1 gap-4 md:order-3 md:grid-cols-3">
+        <Card className="relative overflow-hidden border-t-2 border-t-primary md:col-span-2">
           <CardHeader className="flex-row items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
