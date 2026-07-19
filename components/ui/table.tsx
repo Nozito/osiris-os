@@ -96,13 +96,14 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
 }
 
 function TableRowLink({ href, className }: { href: string; className?: string }) {
+  // A <tr> can only contain <td>/<th> per the HTML spec — an <a> directly
+  // inside it causes a hydration mismatch. Wrapping it in an absolutely
+  // positioned <td> keeps it a valid child while taking it out of the
+  // table's column flow, so it still visually covers the whole row.
   return (
-    <Link
-      href={href}
-      tabIndex={-1}
-      aria-hidden
-      className={cn("absolute inset-0 z-0", className)}
-    />
+    <td className="absolute inset-0 z-0 p-0">
+      <Link href={href} tabIndex={-1} aria-hidden className={cn("block h-full w-full", className)} />
+    </td>
   )
 }
 
