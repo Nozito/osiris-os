@@ -2,7 +2,6 @@ import { TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RevenueChartLazy } from "@/components/dashboard/revenue-chart-lazy";
 import { CountUp } from "@/components/dashboard/count-up";
-import { DashboardShortcuts } from "@/components/dashboard/dashboard-shortcuts";
 import { PipelineBreakdown } from "@/components/dashboard/pipeline-breakdown";
 import { LeadsToFollowUp } from "@/components/dashboard/leads-to-follow-up";
 import { QuotesPending } from "@/components/dashboard/quotes-pending";
@@ -42,24 +41,21 @@ export default async function DashboardPage() {
         description="Indicateurs commerciaux, financiers et production en temps réel."
       />
 
-      {/* Rangée 1 — KPI + raccourcis */}
-      <div className="order-2 flex flex-wrap items-start gap-3">
-        <StatRow
-          className="flex-1"
-          items={[
-            { label: "CA signé", value: <CountUp value={kpis.caSigne} format="currency" />, tone: "primary" },
-            { label: "Leads actifs", value: <CountUp value={kpis.leadsActifs} /> },
-            { label: "Devis en attente", value: <CountUp value={kpis.devisEnvoyes} /> },
-            {
-              label: "Factures en retard",
-              value: <CountUp value={kpis.facturesEnRetard} />,
-              tone: kpis.facturesEnRetard > 0 ? "primary" : "default",
-            },
-            { label: "Projets actifs", value: <CountUp value={kpis.projetsActifs} /> },
-          ]}
-        />
-        <DashboardShortcuts />
-      </div>
+      {/* Rangée 1 — KPI */}
+      <StatRow
+        className="order-2"
+        items={[
+          { label: "CA signé", value: <CountUp value={kpis.caSigne} format="currency" />, tone: "primary" },
+          { label: "Leads actifs", value: <CountUp value={kpis.leadsActifs} /> },
+          { label: "Devis en attente", value: <CountUp value={kpis.devisEnvoyes} /> },
+          {
+            label: "Factures en retard",
+            value: <CountUp value={kpis.facturesEnRetard} />,
+            tone: kpis.facturesEnRetard > 0 ? "primary" : "default",
+          },
+          { label: "Projets actifs", value: <CountUp value={kpis.projetsActifs} /> },
+        ]}
+      />
 
       {/*
         Rangée "listes actionnables" vs "CA/pipeline" : sur mobile, ce qui
