@@ -21,7 +21,15 @@ const NEXT_STATUS: Partial<Record<QuoteStatus, { status: QuoteStatus; label: str
   viewed: { status: "accepted", label: "Marquer accepté" },
 };
 
-export function QuoteActions({ quoteId, status }: { quoteId: string; status: QuoteStatus }) {
+export function QuoteActions({
+  quoteId,
+  status,
+  canDelete,
+}: {
+  quoteId: string;
+  status: QuoteStatus;
+  canDelete: boolean;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const next = NEXT_STATUS[status];
@@ -100,21 +108,23 @@ export function QuoteActions({ quoteId, status }: { quoteId: string; status: Quo
         Dupliquer
       </Button>
 
-      <Button
-        variant="ghost"
-        className="text-destructive"
-        disabled={isPending}
-        onClick={() =>
-          run(async () => {
-            await deleteQuote(quoteId);
-            toast.success("Devis supprimé");
-            router.push("/quotes");
-          })
-        }
-      >
-        <Trash2 className="mr-2 h-4 w-4" />
-        Supprimer
-      </Button>
+      {canDelete && (
+        <Button
+          variant="ghost"
+          className="text-destructive"
+          disabled={isPending}
+          onClick={() =>
+            run(async () => {
+              await deleteQuote(quoteId);
+              toast.success("Devis supprimé");
+              router.push("/quotes");
+            })
+          }
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Supprimer
+        </Button>
+      )}
     </div>
   );
 }

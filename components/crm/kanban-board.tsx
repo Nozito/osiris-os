@@ -28,7 +28,13 @@ const COLUMN_SURFACE: Record<LeadStatus, string> = {
   lost: "bg-white/[0.008] opacity-75",
 };
 
-export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
+export function KanbanBoard({
+  leads,
+  canDelete,
+}: {
+  leads: LeadDetail[];
+  canDelete: boolean;
+}) {
   const [items, setItems] = useState(leads);
   useEffect(() => setItems(leads), [leads]);
   const [selected, setSelected] = useState<LeadDetail | null>(null);
@@ -185,6 +191,7 @@ export function KanbanBoard({ leads }: { leads: LeadDetail[] }) {
         lead={selected}
         open={selected !== null}
         onOpenChange={(open) => !open && setSelected(null)}
+        canDelete={canDelete}
       />
     </>
   );

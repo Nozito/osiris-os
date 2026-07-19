@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/require-admin";
 import { leadSchema, leadScoreSchema } from "@/lib/validations/lead";
 import type { Database } from "@/types/database.types";
 
@@ -158,6 +159,7 @@ export async function convertLeadToClient(leadId: string) {
 }
 
 export async function deleteLead(leadId: string) {
+  await requireAdmin();
   const supabase = await createClient();
   await supabase.from("leads").delete().eq("id", leadId);
   revalidatePath("/crm");

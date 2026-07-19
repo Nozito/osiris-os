@@ -2,33 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { Database } from "@/types/database.types";
 
 export type ActionState = { error?: string; success?: boolean } | undefined;
 
 type Role = Database["public"]["Enums"]["user_role"];
-
-/** Every team-management action must pass this — a hidden tab isn't a real guard. */
-async function requireAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Session expirée, reconnectez-vous.");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") {
-    throw new Error("Action réservée aux administrateurs.");
-  }
-  return user;
-}
 
 const inviteSchema = z.object({
   email: z.string().trim().email("Email invalide."),

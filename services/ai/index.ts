@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import type { AIProvider } from "./provider";
 import { OpenAICompatibleProvider } from "./openai-compatible-provider";
+import { AIError } from "./errors";
 
 let cachedProvider: AIProvider | null = null;
 
@@ -21,9 +22,10 @@ function buildProvider(): AIProvider {
     );
   }
 
-  throw new Error(
-    "Aucune clé IA configurée. Ajoutez GROQ_API_KEY (gratuit sur console.groq.com) ou OPENAI_API_KEY dans .env.local."
+  console.error(
+    "[AI] Aucune clé IA configurée — ajoutez GROQ_API_KEY ou OPENAI_API_KEY dans .env.local."
   );
+  throw new AIError("config_missing");
 }
 
 export function getAIProvider(): AIProvider {
@@ -33,6 +35,8 @@ export function getAIProvider(): AIProvider {
   return cachedProvider;
 }
 
+export { AIError, aiActionError } from "./errors";
+export type { AIErrorCode, AIActionResult } from "./errors";
 export type {
   AIProvider,
   CommercialOfferInput,

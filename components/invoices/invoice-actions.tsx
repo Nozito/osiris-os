@@ -13,9 +13,11 @@ type InvoiceStatus = Database["public"]["Enums"]["invoice_status"];
 export function InvoiceActions({
   invoiceId,
   status,
+  canDelete,
 }: {
   invoiceId: string;
   status: InvoiceStatus;
+  canDelete: boolean;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -77,21 +79,23 @@ export function InvoiceActions({
         </Button>
       )}
 
-      <Button
-        variant="ghost"
-        className="text-destructive"
-        disabled={isPending}
-        onClick={() =>
-          run(async () => {
-            await deleteInvoice(invoiceId);
-            toast.success("Facture supprimée");
-            router.push("/invoices");
-          })
-        }
-      >
-        <Trash2 className="mr-2 h-4 w-4" />
-        Supprimer
-      </Button>
+      {canDelete && (
+        <Button
+          variant="ghost"
+          className="text-destructive"
+          disabled={isPending}
+          onClick={() =>
+            run(async () => {
+              await deleteInvoice(invoiceId);
+              toast.success("Facture supprimée");
+              router.push("/invoices");
+            })
+          }
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Supprimer
+        </Button>
+      )}
     </div>
   );
 }

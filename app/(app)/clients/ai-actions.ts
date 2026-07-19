@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   getAIProvider,
+  aiActionError,
+  type AIActionResult,
   type CommercialOfferResult,
   type WebStrategyResult,
 } from "@/services/ai";
@@ -15,34 +17,53 @@ async function loadClientContext(clientId: string) {
     .eq("id", clientId)
     .single();
 
-  if (!client) throw new Error("Client introuvable.");
   return client;
 }
 
-export async function generateOfferAction(clientId: string): Promise<CommercialOfferResult> {
-  const client = await loadClientContext(clientId);
-  const profile = client.client_business_profiles;
+export async function generateOfferAction(
+  clientId: string
+): Promise<AIActionResult<CommercialOfferResult>> {
+  try {
+    const client = await loadClientContext(clientId);
+    if (!client) {
+      return { ok: false, code: "unknown", message: "Client introuvable.", retryable: false };
+    }
+    const profile = client.client_business_profiles;
 
-  const provider = getAIProvider();
-  return provider.generateCommercialOffer({
-    companyName: client.company_name,
-    sector: client.sector,
-    idealClient: profile?.ideal_client,
-    goals: profile?.goals,
-    services: profile?.services as string[] | null,
-    advantages: profile?.advantages,
-  });
+    const provider = getAIProvider();
+    const data = await provider.generateCommercialOffer({
+      companyName: client.company_name,
+      sector: client.sector,
+      idealClient: profile?.ideal_client,
+      goals: profile?.goals,
+      services: profile?.services as string[] | null,
+      advantages: profile?.advantages,
+    });
+    return { ok: true, data };
+  } catch (error) {
+    return aiActionError(error);
+  }
 }
 
-export async function generateWebStrategyAction(clientId: string): Promise<WebStrategyResult> {
-  const client = await loadClientContext(clientId);
-  const profile = client.client_business_profiles;
+export async function generateWebStrategyAction(
+  clientId: string
+): Promise<AIActionResult<WebStrategyResult>> {
+  try {
+    const client = await loadClientContext(clientId);
+    if (!client) {
+      return { ok: false, code: "unknown", message: "Client introuvable.", retryable: false };
+    }
+    const profile = client.client_business_profiles;
 
-  const provider = getAIProvider();
-  return provider.generateWebStrategy({
-    companyName: client.company_name,
-    sector: client.sector,
-    goals: profile?.goals,
-    services: profile?.services as string[] | null,
-  });
+    const provider = getAIProvider();
+    const data = await provider.generateWebStrategy({
+      companyName: client.company_name,
+      sector: client.sector,
+      goals: profile?.goals,
+      services: profile?.services as string[] | null,
+    });
+    return { ok: true, data };
+  } catch (error) {
+    return aiActionError(error);
+  }
 }

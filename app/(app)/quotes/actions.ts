@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/require-admin";
 import { quoteSchema } from "@/lib/validations/quote";
 import { notifyStaffQuoteSigned } from "@/lib/notify";
 import type { Database } from "@/types/database.types";
@@ -177,6 +178,7 @@ export async function duplicateQuote(quoteId: string) {
 }
 
 export async function deleteQuote(quoteId: string) {
+  await requireAdmin();
   const supabase = await createClient();
   await supabase.from("quotes").delete().eq("id", quoteId);
   revalidatePath("/quotes");

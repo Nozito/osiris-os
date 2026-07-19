@@ -8,6 +8,9 @@ import type {
   WebStrategyInput,
   WebStrategyResult,
 } from "./provider";
+import { AIError, toAIError } from "./errors";
+
+const REQUEST_TIMEOUT_MS = 30_000;
 
 // Works with any OpenAI-compatible chat completions endpoint (OpenAI, Groq, OpenRouter, ...).
 export class OpenAICompatibleProvider implements AIProvider {
@@ -17,19 +20,33 @@ export class OpenAICompatibleProvider implements AIProvider {
   ) {}
 
   private async completeJSON<T>(system: string, user: string): Promise<T> {
-    const response = await this.client.chat.completions.create({
-      model: this.model,
-      response_format: { type: "json_object" },
-      temperature: 0.4,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    });
+    let content: string | null | undefined;
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error("Réponse IA vide.");
-    return JSON.parse(content) as T;
+    try {
+      const response = await this.client.chat.completions.create(
+        {
+          model: this.model,
+          response_format: { type: "json_object" },
+          temperature: 0.4,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: user },
+          ],
+        },
+        { timeout: REQUEST_TIMEOUT_MS }
+      );
+      content = response.choices[0]?.message?.content;
+    } catch (error) {
+      throw toAIError(error);
+    }
+
+    if (!content) throw new AIError("invalid_response");
+
+    try {
+      return JSON.parse(content) as T;
+    } catch (error) {
+      throw toAIError(error);
+    }
   }
 
   async generateCommercialOffer(

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/require-admin";
 import { invoiceSchema } from "@/lib/validations/invoice";
 import type { Database } from "@/types/database.types";
 
@@ -83,6 +84,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: InvoiceStat
 }
 
 export async function deleteInvoice(invoiceId: string) {
+  await requireAdmin();
   const supabase = await createClient();
   await supabase.from("invoices").delete().eq("id", invoiceId);
   revalidatePath("/invoices");

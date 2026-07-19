@@ -3,15 +3,19 @@ import { NewLeadDialog } from "@/components/crm/new-lead-dialog";
 import { KanbanBoard } from "@/components/crm/kanban-board";
 import type { LeadDetail } from "@/components/crm/lead-detail-sheet";
 import { PageHeader } from "@/components/layout/page-header";
+import { getCurrentRole } from "@/lib/get-current-role";
 
 export default async function CrmPage() {
   const supabase = await createClient();
-  const { data: leads } = await supabase
-    .from("leads")
-    .select(
-      "id, name, company, email, phone, source, need, budget, urgency, notes, status, lead_scores(budget_score, urgency_score, sector_score, company_size_score, need_clarity_score, total_score)"
-    )
-    .order("created_at", { ascending: false });
+  const [{ data: leads }, role] = await Promise.all([
+    supabase
+      .from("leads")
+      .select(
+        "id, name, company, email, phone, source, need, budget, urgency, notes, status, lead_scores(budget_score, urgency_score, sector_score, company_size_score, need_clarity_score, total_score)"
+      )
+      .order("created_at", { ascending: false }),
+    getCurrentRole(),
+  ]);
 
   const items: LeadDetail[] = (leads ?? []).map((lead) => ({
     id: lead.id,
@@ -36,7 +40,7 @@ export default async function CrmPage() {
         actions={<NewLeadDialog />}
       />
 
-      <KanbanBoard leads={items} />
+      <KanbanBoard leads={items} canDelete={role === "admin"} />
     </div>
   );
 }

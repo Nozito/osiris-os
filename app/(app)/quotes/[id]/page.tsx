@@ -5,6 +5,7 @@ import { QuoteStatusBadge } from "@/components/quotes/status-badge";
 import { QuoteActions } from "@/components/quotes/quote-actions";
 import { QuoteEditForm } from "@/components/quotes/quote-edit-form";
 import { computeTotals } from "@/lib/validations/quote";
+import { getCurrentRole } from "@/lib/get-current-role";
 
 function formatEUR(value: number) {
   return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
@@ -18,11 +19,14 @@ export default async function QuoteDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: quote } = await supabase
-    .from("quotes")
-    .select("*, clients(id, company_name), quote_items(*)")
-    .eq("id", id)
-    .single();
+  const [{ data: quote }, role] = await Promise.all([
+    supabase
+      .from("quotes")
+      .select("*, clients(id, company_name), quote_items(*)")
+      .eq("id", id)
+      .single(),
+    getCurrentRole(),
+  ]);
 
   if (!quote) notFound();
 
@@ -39,7 +43,7 @@ export default async function QuoteDetailPage({
         <QuoteStatusBadge status={quote.status} />
       </div>
 
-      <QuoteActions quoteId={quote.id} status={quote.status} />
+      <QuoteActions quoteId={quote.id} status={quote.status} canDelete={role === "admin"} />
 
       {quote.status === "draft" ? (
         <Card>

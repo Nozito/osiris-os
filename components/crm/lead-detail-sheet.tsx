@@ -68,23 +68,33 @@ export function LeadDetailSheet({
   lead,
   open,
   onOpenChange,
+  canDelete,
 }: {
   lead: LeadDetail | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  canDelete: boolean;
 }) {
   if (!lead) return null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-lg overflow-y-auto">
-        <LeadDetailForm lead={lead} onClose={() => onOpenChange(false)} />
+        <LeadDetailForm lead={lead} onClose={() => onOpenChange(false)} canDelete={canDelete} />
       </SheetContent>
     </Sheet>
   );
 }
 
-function LeadDetailForm({ lead, onClose }: { lead: LeadDetail; onClose: () => void }) {
+function LeadDetailForm({
+  lead,
+  onClose,
+  canDelete,
+}: {
+  lead: LeadDetail;
+  onClose: () => void;
+  canDelete: boolean;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [scores, setScores] = useState({
@@ -248,15 +258,19 @@ function LeadDetailForm({ lead, onClose }: { lead: LeadDetail; onClose: () => vo
         {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
 
         <SheetFooter className="flex-row justify-between gap-2 px-0">
-          <Button
-            type="button"
-            variant="ghost"
-            className="text-destructive"
-            disabled={isPending}
-            onClick={handleDelete}
-          >
-            Supprimer
-          </Button>
+          <div>
+            {canDelete && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-destructive"
+                disabled={isPending}
+                onClick={handleDelete}
+              >
+                Supprimer
+              </Button>
+            )}
+          </div>
           <div className="flex gap-2">
             {lead.status !== "signed" && (
               <Button

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { InvoiceStatusBadge } from "@/components/invoices/status-badge";
 import { InvoiceActions } from "@/components/invoices/invoice-actions";
 import { computeTotals } from "@/lib/validations/quote";
+import { getCurrentRole } from "@/lib/get-current-role";
 
 function formatEUR(value: number) {
   return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
@@ -17,11 +18,14 @@ export default async function InvoiceDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: invoice } = await supabase
-    .from("invoices")
-    .select("*, clients(id, company_name), invoice_items(*)")
-    .eq("id", id)
-    .single();
+  const [{ data: invoice }, role] = await Promise.all([
+    supabase
+      .from("invoices")
+      .select("*, clients(id, company_name), invoice_items(*)")
+      .eq("id", id)
+      .single(),
+    getCurrentRole(),
+  ]);
 
   if (!invoice) notFound();
 
@@ -38,7 +42,7 @@ export default async function InvoiceDetailPage({
         <InvoiceStatusBadge status={invoice.status} />
       </div>
 
-      <InvoiceActions invoiceId={invoice.id} status={invoice.status} />
+      <InvoiceActions invoiceId={invoice.id} status={invoice.status} canDelete={role === "admin"} />
 
       <Card>
         <CardHeader>
