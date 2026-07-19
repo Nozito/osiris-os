@@ -24,6 +24,12 @@ export default function AuthLayout({
           }}
         />
 
+        <OsirisMark
+          variant="watermark"
+          size={560}
+          className="pointer-events-none absolute -right-28 -bottom-32 -rotate-6 opacity-[0.05]"
+        />
+
         <OsirisMark size={36} className="relative" />
 
         <div className="relative max-w-md space-y-4">

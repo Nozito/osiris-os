@@ -14,7 +14,13 @@ export default function ClientPortalLayout({
       <header className="glass sticky top-0 z-10 rounded-none border-x-0 border-t-0">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <OsirisMark size={32} />
+            <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+              <span
+                className="pointer-events-none absolute inset-[-6px] rounded-full opacity-70 blur-md"
+                style={{ background: "radial-gradient(circle, rgba(0,102,255,0.35), transparent 70%)" }}
+              />
+              <OsirisMark size={22} className="relative" />
+            </span>
             <span className="font-heading text-[15px] font-semibold tracking-tight">
               Espace client <span className="text-primary">Osiris</span>
             </span>

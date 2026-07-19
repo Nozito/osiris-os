@@ -108,7 +108,13 @@ export function AppSidebar({
     <Sidebar collapsible="icon" className="border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4 group-data-[collapsible=icon]:px-2.5">
         <Link href="/dashboard" className="group relative flex items-center gap-2.5">
-          <OsirisMark size={32} />
+          <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+            <span
+              className="pointer-events-none absolute inset-[-6px] rounded-full opacity-70 blur-md"
+              style={{ background: "radial-gradient(circle, rgba(0,102,255,0.35), transparent 70%)" }}
+            />
+            <OsirisMark size={22} className="relative" />
+          </span>
           <span className="font-heading text-base font-bold tracking-tight transition-opacity duration-(--duration-base) group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:opacity-0">
             Osiris <span className="text-primary">OS</span>
           </span>
