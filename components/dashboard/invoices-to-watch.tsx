@@ -46,7 +46,7 @@ export function InvoicesToWatch({ invoices }: { invoices: Invoice[] }) {
               <Link
                 key={invoice.id}
                 href={`/invoices/${invoice.id}`}
-                className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0 transition-colors duration-(--duration-fast) hover:text-primary"
+                className="-mx-(--card-spacing) flex items-center justify-between gap-3 rounded-md px-(--card-spacing) py-2.5 transition-colors duration-(--duration-fast) first:pt-0 last:pb-0 hover:bg-white/[0.03] hover:text-primary active:bg-white/[0.05]"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{invoice.number}</p>

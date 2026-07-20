@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { LeadCard } from "@/components/crm/lead-card";
 import { LeadDetailSheet, type LeadDetail } from "@/components/crm/lead-detail-sheet";
@@ -68,11 +69,23 @@ export function KanbanBoard({
   }, [items.length]);
 
   function moveLead(leadId: string, status: LeadStatus) {
+    const previousStatus = items.find((lead) => lead.id === leadId)?.status;
+    if (previousStatus === status) return;
+
     setItems((prev) =>
       prev.map((lead) => (lead.id === leadId ? { ...lead, status } : lead))
     );
-    startTransition(() => {
-      updateLeadStatus(leadId, status);
+    startTransition(async () => {
+      try {
+        await updateLeadStatus(leadId, status);
+      } catch {
+        toast.error("Impossible de déplacer ce lead, réessayez.");
+        setItems((prev) =>
+          prev.map((lead) =>
+            lead.id === leadId && previousStatus ? { ...lead, status: previousStatus } : lead
+          )
+        );
+      }
     });
   }
 

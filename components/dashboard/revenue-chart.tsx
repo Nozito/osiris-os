@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -11,6 +12,18 @@ import {
 } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
+
+/** Charts convey nothing to screen readers on their own — this gives the
+ * same insight (trend direction + total) as plain text. */
+function chartSummary(data: { month: string; total: number }[]) {
+  if (data.length === 0) return "Aucune donnée de chiffre d'affaires disponible.";
+  const total = data.reduce((sum, d) => sum + d.total, 0);
+  const first = data[0].total;
+  const last = data[data.length - 1].total;
+  const trend = last > first ? "en hausse" : last < first ? "en baisse" : "stable";
+  const totalLabel = total.toLocaleString("fr-FR");
+  return `Chiffre d'affaires encaissé de ${data[0].month} à ${data[data.length - 1].month} : ${totalLabel} € au total, tendance ${trend}.`;
+}
 
 type ChartTooltipProps = {
   active?: boolean;
@@ -46,6 +59,8 @@ function Chart({
   data: { month: string; total: number }[];
   interactive?: boolean;
 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <ResponsiveContainer width="100%" height={224}>
       <AreaChart data={data} margin={{ left: -20, top: 8, right: 8 }}>
@@ -83,6 +98,7 @@ function Chart({
           stroke="#0066ff"
           strokeWidth={2}
           fill="url(#revenueFill)"
+          isAnimationActive={!shouldReduceMotion}
           animationDuration={700}
           animationEasing="ease-out"
           activeDot={{ r: 4, strokeWidth: 0, fill: "#0066ff" }}
@@ -100,7 +116,7 @@ export function RevenueChart({
   if (data.length === 0) {
     return (
       <div className="relative overflow-hidden rounded-lg">
-        <div className="pointer-events-none opacity-[0.14] grayscale">
+        <div className="pointer-events-none opacity-[0.14] grayscale" aria-hidden>
           <Chart data={PLACEHOLDER_DATA} interactive={false} />
         </div>
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-card via-card/60 to-transparent">
@@ -115,5 +131,9 @@ export function RevenueChart({
     );
   }
 
-  return <Chart data={data} />;
+  return (
+    <div role="img" aria-label={chartSummary(data)}>
+      <Chart data={data} />
+    </div>
+  );
 }

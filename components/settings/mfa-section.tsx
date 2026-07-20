@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { createClient } from "@/lib/supabase/client";
 
 type Factor = { id: string; friendly_name?: string | null };
@@ -19,6 +20,8 @@ type ViewState =
 
 export function MfaSection() {
   const [state, setState] = useState<ViewState>({ step: "loading" });
+  const [factorToRemove, setFactorToRemove] = useState<Factor | null>(null);
+  const [removing, setRemoving] = useState(false);
   const supabase = createClient();
 
   async function loadFactors() {
@@ -71,11 +74,14 @@ export function MfaSection() {
   }
 
   async function removeFactor(factorId: string) {
+    setRemoving(true);
     const { error } = await supabase.auth.mfa.unenroll({ factorId });
+    setRemoving(false);
     if (error) {
       toast.error("Impossible de désactiver la vérification en deux étapes.");
       return;
     }
+    setFactorToRemove(null);
     toast.success("Vérification en deux étapes désactivée.");
     await loadFactors();
   }
@@ -162,13 +168,23 @@ export function MfaSection() {
             variant="ghost"
             size="sm"
             className="text-muted-foreground hover:text-destructive"
-            onClick={() => removeFactor(factor.id)}
+            onClick={() => setFactorToRemove(factor)}
           >
             <ShieldOff className="mr-1.5 h-3.5 w-3.5" />
             Désactiver
           </Button>
         </div>
       ))}
+
+      <ConfirmDialog
+        open={factorToRemove !== null}
+        onOpenChange={(open) => !open && setFactorToRemove(null)}
+        title="Désactiver la vérification en deux étapes ?"
+        description="Votre compte sera moins protégé : la connexion ne demandera plus de code en plus du mot de passe."
+        confirmLabel="Désactiver"
+        pending={removing}
+        onConfirm={() => factorToRemove && removeFactor(factorToRemove.id)}
+      />
     </div>
   );
 }

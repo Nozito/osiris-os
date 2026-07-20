@@ -35,10 +35,10 @@ export default async function QuoteDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="font-heading text-lg font-bold tracking-tight">{quote.number}</h2>
-          <p className="text-sm text-muted-foreground">{quote.clients?.company_name}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="truncate font-heading text-lg font-bold tracking-tight">{quote.number}</h2>
+          <p className="truncate text-sm text-muted-foreground">{quote.clients?.company_name}</p>
         </div>
         <QuoteStatusBadge status={quote.status} />
       </div>

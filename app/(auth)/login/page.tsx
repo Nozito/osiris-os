@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { OsirisMark } from "@/components/layout/osiris-mark";
 import { playAuthTransition, endAuthTransition } from "@/lib/auth-transition";
@@ -145,7 +146,7 @@ export default function LoginPage() {
               Mot de passe oublié ?
             </Link>
           </div>
-          <Input id="password" name="password" type="password" placeholder="••••••••" required />
+          <PasswordInput id="password" name="password" placeholder="••••••••" required />
         </div>
         {state?.error && (
           <p className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">

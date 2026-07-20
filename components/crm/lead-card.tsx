@@ -74,7 +74,7 @@ export function LeadCard({
           onClick();
         }
       }}
-      className="group/lead-card w-full cursor-grab rounded-lg border border-border bg-card p-3 text-left shadow-[var(--shadow-xs)] transition-[border-color,box-shadow,transform] duration-(--duration-fast) ease-(--ease-premium) hover:-translate-y-[1px] hover:border-white/[0.16] hover:shadow-[var(--shadow-sm)] active:cursor-grabbing active:scale-[0.99]"
+      className="group/lead-card w-full cursor-grab rounded-lg border border-border bg-card p-3 text-left shadow-[var(--shadow-xs)] outline-none transition-[border-color,box-shadow,transform] duration-(--duration-fast) ease-(--ease-premium) hover:-translate-y-[1px] hover:border-white/[0.16] hover:shadow-[var(--shadow-sm)] focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/40 active:cursor-grabbing active:scale-[0.99]"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">

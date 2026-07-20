@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { OsirisMark } from "@/components/layout/osiris-mark";
 import { createClient } from "@/lib/supabase/client";
@@ -182,11 +182,11 @@ function SetPasswordFormInner({
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-1.5">
           <Label htmlFor="password">Nouveau mot de passe</Label>
-          <Input id="password" name="password" type="password" minLength={8} required />
+          <PasswordInput id="password" name="password" minLength={8} required />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="confirm_password">Confirmer le mot de passe</Label>
-          <Input id="confirm_password" name="confirm_password" type="password" minLength={8} required />
+          <PasswordInput id="confirm_password" name="confirm_password" minLength={8} required />
         </div>
         {error && (
           <p className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">

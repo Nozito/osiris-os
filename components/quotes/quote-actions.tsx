@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Download, Copy, Trash2, ArrowRightCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   updateQuoteStatus,
   duplicateQuote,
@@ -33,6 +34,7 @@ export function QuoteActions({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const next = NEXT_STATUS[status];
+  const deleteConfirm = useConfirmDialog();
 
   function run(action: () => Promise<unknown>, successMessage?: string) {
     startTransition(async () => {
@@ -109,21 +111,33 @@ export function QuoteActions({
       </Button>
 
       {canDelete && (
-        <Button
-          variant="ghost"
-          className="text-destructive"
-          disabled={isPending}
-          onClick={() =>
-            run(async () => {
-              await deleteQuote(quoteId);
-              toast.success("Devis supprimé");
-              router.push("/quotes");
-            })
-          }
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Supprimer
-        </Button>
+        <>
+          <Button
+            variant="ghost"
+            className="text-destructive"
+            disabled={isPending}
+            onClick={deleteConfirm.requestConfirm}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Supprimer
+          </Button>
+          <ConfirmDialog
+            open={deleteConfirm.open}
+            onOpenChange={deleteConfirm.setOpen}
+            title="Supprimer ce devis ?"
+            description="Cette action est définitive et ne peut pas être annulée."
+            confirmLabel="Supprimer"
+            pending={isPending}
+            onConfirm={() => {
+              deleteConfirm.setOpen(false);
+              run(async () => {
+                await deleteQuote(quoteId);
+                toast.success("Devis supprimé");
+                router.push("/quotes");
+              });
+            }}
+          />
+        </>
       )}
     </div>
   );

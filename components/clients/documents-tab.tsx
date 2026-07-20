@@ -37,6 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { createClient } from "@/lib/supabase/client";
 import {
   recordDocument,
@@ -112,6 +113,7 @@ export function DocumentsTab({
   const [fulfillingRequestId, setFulfillingRequestId] = useState<string | null>(null);
   const [requestOpen, setRequestOpen] = useState(false);
   const [requestPending, startRequestTransition] = useTransition();
+  const [docToDelete, setDocToDelete] = useState<DocumentRow | null>(null);
 
   const isStaff = viewerRole === "staff";
   const pendingRequests = documentRequests.filter((r) => r.status === "pending");
@@ -170,9 +172,14 @@ export function DocumentsTab({
   }
 
   function handleDelete(doc: DocumentRow) {
+    setDocToDelete(null);
     startTransition(async () => {
-      await deleteDocument(clientId, doc.id, doc.storage_path);
-      toast.success("Document supprimé");
+      try {
+        await deleteDocument(clientId, doc.id, doc.storage_path);
+        toast.success("Document supprimé");
+      } catch {
+        toast.error("Échec de la suppression du document.");
+      }
     });
   }
 
@@ -224,6 +231,7 @@ export function DocumentsTab({
                     disabled={requestPending}
                     onClick={() => handleCancelRequest(req.id)}
                     title="Annuler la demande"
+                    aria-label={`Annuler la demande "${req.label}"`}
                   >
                     <X className="h-3.5 w-3.5" />
                   </Button>
@@ -405,7 +413,12 @@ export function DocumentsTab({
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => handleDownload(doc)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDownload(doc)}
+                    aria-label={`Télécharger ${doc.file_name}`}
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
                   {isStaff && (
@@ -413,7 +426,8 @@ export function DocumentsTab({
                       variant="ghost"
                       size="icon"
                       disabled={isPending}
-                      onClick={() => handleDelete(doc)}
+                      onClick={() => setDocToDelete(doc)}
+                      aria-label={`Supprimer ${doc.file_name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -424,6 +438,20 @@ export function DocumentsTab({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={docToDelete !== null}
+        onOpenChange={(open) => !open && setDocToDelete(null)}
+        title="Supprimer ce document ?"
+        description={
+          docToDelete
+            ? `« ${docToDelete.file_name} » sera définitivement supprimé.`
+            : undefined
+        }
+        confirmLabel="Supprimer"
+        pending={isPending}
+        onConfirm={() => docToDelete && handleDelete(docToDelete)}
+      />
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function ActivityFeed({ events }: { events: Event[] }) {
               <Link
                 key={event.id}
                 href={event.href}
-                className="flex items-center gap-3 py-2 transition-colors duration-(--duration-fast) hover:text-primary"
+                className="-mx-(--card-spacing) flex items-center gap-3 rounded-md px-(--card-spacing) py-2.5 transition-colors duration-(--duration-fast) hover:bg-white/[0.03] hover:text-primary active:bg-white/[0.05]"
               >
                 <span
                   className={cn(

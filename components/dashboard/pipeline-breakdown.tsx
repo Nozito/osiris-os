@@ -33,7 +33,7 @@ export function PipelineBreakdown({ stages }: { stages: Stage[] }) {
               <Link
                 key={stage.status}
                 href="/crm"
-                className="block space-y-1.5 rounded-md transition-opacity duration-(--duration-fast) hover:opacity-80"
+                className="-mx-(--card-spacing) block space-y-1.5 rounded-md px-(--card-spacing) py-1.5 transition-colors duration-(--duration-fast) hover:bg-white/[0.03] active:bg-white/[0.05]"
               >
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-foreground/85">{stage.label}</span>

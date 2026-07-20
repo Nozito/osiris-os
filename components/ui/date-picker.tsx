@@ -85,6 +85,7 @@ export function DatePicker({
               variant="ghost"
               size="icon-xs"
               onClick={() => setViewMonth((m) => subMonths(m, 1))}
+              aria-label="Mois précédent"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
@@ -96,6 +97,7 @@ export function DatePicker({
               variant="ghost"
               size="icon-xs"
               onClick={() => setViewMonth((m) => addMonths(m, 1))}
+              aria-label="Mois suivant"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>

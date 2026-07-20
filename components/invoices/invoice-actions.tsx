@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog";
 import { updateInvoiceStatus, deleteInvoice } from "@/app/(app)/invoices/actions";
 import type { Database } from "@/types/database.types";
 
@@ -21,6 +22,7 @@ export function InvoiceActions({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const deleteConfirm = useConfirmDialog();
 
   function run(action: () => Promise<unknown>, successMessage?: string) {
     startTransition(async () => {
@@ -80,21 +82,33 @@ export function InvoiceActions({
       )}
 
       {canDelete && (
-        <Button
-          variant="ghost"
-          className="text-destructive"
-          disabled={isPending}
-          onClick={() =>
-            run(async () => {
-              await deleteInvoice(invoiceId);
-              toast.success("Facture supprimée");
-              router.push("/invoices");
-            })
-          }
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Supprimer
-        </Button>
+        <>
+          <Button
+            variant="ghost"
+            className="text-destructive"
+            disabled={isPending}
+            onClick={deleteConfirm.requestConfirm}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Supprimer
+          </Button>
+          <ConfirmDialog
+            open={deleteConfirm.open}
+            onOpenChange={deleteConfirm.setOpen}
+            title="Supprimer cette facture ?"
+            description="Cette action est définitive et ne peut pas être annulée."
+            confirmLabel="Supprimer"
+            pending={isPending}
+            onConfirm={() => {
+              deleteConfirm.setOpen(false);
+              run(async () => {
+                await deleteInvoice(invoiceId);
+                toast.success("Facture supprimée");
+                router.push("/invoices");
+              });
+            }}
+          />
+        </>
       )}
     </div>
   );

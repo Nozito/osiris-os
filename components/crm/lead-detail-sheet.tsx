@@ -23,6 +23,7 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
+import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   updateLead,
   updateLeadStatus,
@@ -103,6 +104,7 @@ function LeadDetailForm({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const deleteConfirm = useConfirmDialog();
   const [scores, setScores] = useState({
     budget_score: lead.scores?.budget_score ?? 50,
     urgency_score: lead.scores?.urgency_score ?? 50,
@@ -154,11 +156,16 @@ function LeadDetailForm({
   }
 
   function handleDelete() {
+    deleteConfirm.setOpen(false);
     startTransition(async () => {
-      await deleteLead(lead.id);
-      toast.success("Lead supprimé");
-      onClose();
-      router.refresh();
+      try {
+        await deleteLead(lead.id);
+        toast.success("Lead supprimé");
+        onClose();
+        router.refresh();
+      } catch {
+        toast.error("Échec de la suppression.");
+      }
     });
   }
 
@@ -266,15 +273,26 @@ function LeadDetailForm({
         <SheetFooter className="flex-row justify-between gap-2 px-0">
           <div>
             {canDelete && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="text-destructive"
-                disabled={isPending}
-                onClick={handleDelete}
-              >
-                Supprimer
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive"
+                  disabled={isPending}
+                  onClick={deleteConfirm.requestConfirm}
+                >
+                  Supprimer
+                </Button>
+                <ConfirmDialog
+                  open={deleteConfirm.open}
+                  onOpenChange={deleteConfirm.setOpen}
+                  title="Supprimer ce lead ?"
+                  description="Cette action est définitive et ne peut pas être annulée."
+                  confirmLabel="Supprimer"
+                  pending={isPending}
+                  onConfirm={handleDelete}
+                />
+              </>
             )}
           </div>
           <div className="flex gap-2">

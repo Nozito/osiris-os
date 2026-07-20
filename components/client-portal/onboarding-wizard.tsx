@@ -69,6 +69,7 @@ export function OnboardingWizard({
   const [completed, setCompleted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const info = useAdvanceOnSuccess(updateClientInfo.bind(null, clientId), next);
   const avatar = useAdvanceOnSuccess(updateBusinessProfile.bind(null, clientId), next);
@@ -106,14 +107,19 @@ export function OnboardingWizard({
       <ol className="flex items-center gap-2">
         {STEPS.map((label, i) => (
           <li key={label} className="flex flex-1 items-center gap-2">
-            <span
+            <button
+              type="button"
+              disabled={i >= step}
+              onClick={() => setStep(i)}
+              aria-label={`Retourner à l'étape ${i + 1} : ${label}`}
+              aria-current={i === step ? "step" : undefined}
               className={cn(
                 "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium transition-colors duration-(--duration-base)",
                 i < step
-                  ? "bg-primary text-primary-foreground"
+                  ? "cursor-pointer bg-primary text-primary-foreground hover:bg-[color-mix(in_oklch,var(--primary),white_10%)]"
                   : i === step
                     ? "border border-primary text-primary"
-                    : "border border-border text-muted-foreground"
+                    : "cursor-default border border-border text-muted-foreground"
               )}
             >
               {i < step ? (
@@ -130,7 +136,7 @@ export function OnboardingWizard({
               ) : (
                 i + 1
               )}
-            </span>
+            </button>
             <span
               className={cn(
                 "text-xs transition-colors duration-(--duration-base)",
@@ -213,6 +219,7 @@ export function OnboardingWizard({
               ]}
               error={avatar.state?.error}
               pending={avatar.pending}
+              onBack={back}
             />
           </motion.form>
         )}
@@ -241,6 +248,7 @@ export function OnboardingWizard({
               ]}
               error={positioning.state?.error}
               pending={positioning.pending}
+              onBack={back}
             />
           </motion.form>
         )}
@@ -281,6 +289,7 @@ export function OnboardingWizard({
               error={branding.state?.error}
               pending={branding.pending}
               submitLabel="Terminer l'onboarding"
+              onBack={back}
             />
           </motion.form>
         )}
@@ -294,11 +303,13 @@ function StepFields({
   error,
   pending,
   submitLabel = "Continuer",
+  onBack,
 }: {
   fields: { name: string; label: string; type?: "text" | "textarea"; defaultValue?: string | null }[];
   error?: string;
   pending: boolean;
   submitLabel?: string;
+  onBack?: () => void;
 }) {
   return (
     <>
@@ -323,9 +334,16 @@ function StepFields({
         ))}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={pending}>
-        {pending ? "Enregistrement..." : submitLabel}
-      </Button>
+      <div className="flex gap-2">
+        {onBack && (
+          <Button type="button" variant="outline" disabled={pending} onClick={onBack}>
+            Retour
+          </Button>
+        )}
+        <Button type="submit" disabled={pending}>
+          {pending ? "Enregistrement..." : submitLabel}
+        </Button>
+      </div>
     </>
   );
 }

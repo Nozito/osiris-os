@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog";
 import { signQuote, updateQuoteStatus } from "@/app/(app)/quotes/actions";
 
 export function SignQuoteForm({ quoteId }: { quoteId: string }) {
@@ -13,6 +14,7 @@ export function SignQuoteForm({ quoteId }: { quoteId: string }) {
   const [name, setName] = useState("");
   const [checked, setChecked] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const refuseConfirm = useConfirmDialog();
 
   function handleSign() {
     if (!name.trim() || !checked) return;
@@ -28,6 +30,7 @@ export function SignQuoteForm({ quoteId }: { quoteId: string }) {
   }
 
   function handleRefuse() {
+    refuseConfirm.setOpen(false);
     startTransition(async () => {
       try {
         await updateQuoteStatus(quoteId, "refused");
@@ -64,12 +67,21 @@ export function SignQuoteForm({ quoteId }: { quoteId: string }) {
       </p>
       <div className="flex gap-2">
         <Button disabled={!name.trim() || !checked || isPending} onClick={handleSign}>
-          Signer le devis
+          {isPending ? "Signature en cours..." : "Signer le devis"}
         </Button>
-        <Button variant="outline" disabled={isPending} onClick={handleRefuse}>
+        <Button variant="outline" disabled={isPending} onClick={refuseConfirm.requestConfirm}>
           Refuser
         </Button>
       </div>
+      <ConfirmDialog
+        open={refuseConfirm.open}
+        onOpenChange={refuseConfirm.setOpen}
+        title="Refuser ce devis ?"
+        description="Le prestataire sera notifié de votre refus. Vous pourrez lui demander un nouveau devis si besoin."
+        confirmLabel="Refuser le devis"
+        pending={isPending}
+        onConfirm={handleRefuse}
+      />
     </div>
   );
 }
